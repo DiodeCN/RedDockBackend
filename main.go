@@ -8,7 +8,6 @@ import (
 	"github.com/DiodeCN/RedDockBackend/tweet"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -41,54 +40,8 @@ func main() {
 	}
 
 	r.GET("/api/tweets", func(c *gin.Context) {
-		reqCtx, reqCancel := context.WithTimeout(context.Background(), 5*time.Second)
-		defer reqCancel()
-
-		// Check if the collection is empty
-		count, err := tweetsCollection.CountDocuments(reqCtx, bson.D{})
+		tweets, err := tweet.GetAllTweets(ctx, tweetsCollection) // 使用新的函数
 		if err != nil {
-			log.Fatal(err)
-		}
-
-		// If the collection is empty, insert a new "helloworld" tweet
-		if count == 0 {
-			helloTweet := tweet.Tweet{ // 使用 tweet.Tweet 类型
-				ID:             "你好世界！",
-				Name:           "他妈的",
-				AvatarURL:      "helloworld",
-				HoursSincePost: 0,
-				Content:        "如果你看到这个东西，说明数据库已经被remade了。",
-				Likes:          0,
-				Favorites:      0,
-				Retweets:       0,
-				Shares:         0,
-				Views:          0,
-				Comments:       0,
-			}
-
-			_, err = tweetsCollection.InsertOne(reqCtx, helloTweet)
-			if err != nil {
-				log.Fatal(err)
-			}
-		}
-
-		cur, err := tweetsCollection.Find(reqCtx, bson.D{})
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer cur.Close(reqCtx)
-
-		var tweets []tweet.Tweet // 使用 tweet.Tweet 类型
-		for cur.Next(reqCtx) {
-			var tweet tweet.Tweet // 使用 tweet.Tweet 类型
-			err := cur.Decode(&tweet)
-			if err != nil {
-				log.Fatal(err)
-			}
-			tweets = append(tweets, tweet)
-		}
-		if err := cur.Err(); err != nil {
-
 			log.Fatal(err)
 		}
 
