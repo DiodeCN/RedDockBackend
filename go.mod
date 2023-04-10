@@ -1,4 +1,4 @@
-module hongshu/mod
+module github.com/DiodeCN/RedDockBackend
 
 go 1.18
 
