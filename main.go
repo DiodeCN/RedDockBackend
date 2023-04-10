@@ -5,6 +5,7 @@ import (
 	"log"
 	"time"
 
+	"github.com/DiodeCN/RedDockBackend/tweet"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
@@ -65,7 +66,7 @@ func main() {
 
 		// If the collection is empty, insert a new "helloworld" tweet
 		if count == 0 {
-			helloTweet := Tweet{
+			helloTweet := tweet.Tweet{ // 使用 tweet.Tweet 类型
 				ID:             "你好世界！",
 				Name:           "他妈的",
 				AvatarURL:      "helloworld",
@@ -91,9 +92,9 @@ func main() {
 		}
 		defer cur.Close(reqCtx)
 
-		var tweets []Tweet
+		var tweets []tweet.Tweet // 使用 tweet.Tweet 类型
 		for cur.Next(reqCtx) {
-			var tweet Tweet
+			var tweet tweet.Tweet // 使用 tweet.Tweet 类型
 			err := cur.Decode(&tweet)
 			if err != nil {
 				log.Fatal(err)
