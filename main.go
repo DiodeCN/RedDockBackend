@@ -15,6 +15,8 @@ import (
 )
 
 func main() {
+	register.JustSendASMS()
+
 	r := gin.Default()
 
 	// 添加CORS中间件，允许来自所有域的请求
@@ -69,5 +71,4 @@ func main() {
 		log.Fatal(err)
 	}
 
-	register.JustSendASMS()
 }
