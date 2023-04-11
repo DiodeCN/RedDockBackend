@@ -3,7 +3,9 @@ package register
 import (
 	"encoding/json"
 	"fmt"
+	"os"
 
+	"github.com/spf13/viper"
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/errors"
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/profile"
@@ -11,6 +13,19 @@ import (
 )
 
 func JustSendASMS() {
+	// 初始化 viper
+	viper.SetConfigFile("sth.config") // 配置文件名
+	viper.SetConfigType("yaml")       // 配置文件类型
+
+	if err := viper.ReadInConfig(); err != nil {
+		fmt.Printf("Error reading config file: %s\n", err)
+		os.Exit(1)
+	}
+
+	// 读取 tencentcloud_secret_id 和 tencentcloud_secret_key
+	secretID := viper.GetString("tencentcloud_secret_id")
+	secretKey := viper.GetString("tencentcloud_secret_key")
+
 	/* 必要步骤：
 	 * 实例化一个认证对象，入参需要传入腾讯云账户密钥对secretId，secretKey。
 	 * 这里采用的是从环境变量读取的方式，需要在环境变量中先设置这两个值。
@@ -18,10 +33,7 @@ func JustSendASMS() {
 	 * 以免泄露密钥对危及你的财产安全。
 	 * SecretId、SecretKey 查询: https://console.cloud.tencent.com/cam/capi */
 	credential := common.NewCredential(
-		// os.Getenv("TENCENTCLOUD_SECRET_ID"),
-		// os.Getenv("TENCENTCLOUD_SECRET_KEY"),
-		"AKIDBF7nFWabOwFMI0DE3e19275rPjphLkV3",
-		"QbX8VeYDdqoYCl7F8nDPMxMWSBk6GF5l",
+		secretID, secretKey,
 	)
 	/* 非必要步骤:
 	 * 实例化一个客户端配置对象，可以指定超时时间等配置 */
