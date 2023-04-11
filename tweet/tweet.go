@@ -41,7 +41,7 @@ func (t *Tweet) UpdateFavorites(n int) {
 }
 
 func GetTweets(tweetsCollection *mongo.Collection) []Tweet {
-	reqCtx, reqCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	reqCtx, reqCancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer reqCancel()
 
 	// Check if the collection is empty
