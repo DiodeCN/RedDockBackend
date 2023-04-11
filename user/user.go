@@ -10,6 +10,21 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
+func (u *User) Sanitize() *User {
+	return &User{
+		ID:           u.ID,
+		FirstName:    u.FirstName,
+		LastName:     u.LastName,
+		Email:        u.Email,
+		Username:     u.Username,
+		Phone:        u.Phone,
+		InviteCode:   u.InviteCode,
+		InvitedBy:    u.InvitedBy,
+		Nickname:     u.Nickname,
+		Registration: u.Registration,
+	}
+}
+
 type User struct {
 	ID           string    `json:"id" bson:"id"`
 	FirstName    string    `json:"first_name" bson:"first_name"`
