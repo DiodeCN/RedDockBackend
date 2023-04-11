@@ -3,23 +3,29 @@ package tweet
 import (
 	"context"
 	"log"
+	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type Tweet struct {
-	ID             string `json:"id" bson:"id"`
-	Name           string `json:"name" bson:"name"`
-	AvatarURL      string `json:"avatar_url" bson:"avatar_url"`
-	HoursSincePost int    `json:"hours_since_post" bson:"hours_since_post"`
-	Content        string `json:"content" bson:"content"`
-	Likes          int    `json:"likes" bson:"likes"`
-	Favorites      int    `json:"favorites" bson:"favorites"`
-	Retweets       int    `json:"retweets" bson:"retweets"`
-	Shares         int    `json:"shares" bson:"shares"`
-	Views          int    `json:"views" bson:"views"`
-	Comments       int    `json:"comments" bson:"comments"`
+	ID        string    `json:"id" bson:"id"`
+	Name      string    `json:"name" bson:"name"`
+	AvatarURL string    `json:"avatar_url" bson:"avatar_url"`
+	Time      time.Time `json:"time" bson:"time"`
+	Day       string    `json:"day" bson:"day"`
+	Hour      int       `json:"hour" bson:"hour"`
+	Minute    int       `json:"minute" bson:"minute"`
+	Compid    string    `json:"compid" bson:"compid"`
+	Dayid     string    `json:"dayid" bson:"dayid"`
+	Content   string    `json:"content" bson:"content"`
+	Likes     int       `json:"likes" bson:"likes"`
+	Favorites int       `json:"favorites" bson:"favorites"`
+	Retweets  int       `json:"retweets" bson:"retweets"`
+	Shares    int       `json:"shares" bson:"shares"`
+	Views     int       `json:"views" bson:"views"`
+	Comments  int       `json:"comments" bson:"comments"`
 }
 
 func NewTweet(id, name, avatarURL, content string) *Tweet {
