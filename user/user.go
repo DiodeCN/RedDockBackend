@@ -6,6 +6,7 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type User struct {
@@ -14,18 +15,36 @@ type User struct {
 	LastName  string `json:"last_name" bson:"last_name"`
 	Email     string `json:"email" bson:"email"`
 	Username  string `json:"username" bson:"username"`
-	Password  string `json:"password" bson:"password"` // 注意：实际应用中应使用加密存储密码
+	Password  string `json:"-" bson:"password"` // 不返回密码，仅在数据库中存储
 }
 
-func NewUser(id, firstName, lastName, email, username, password string) *User {
+func NewUser(id, firstName, lastName, email, username, password string) (*User, error) {
+	hashedPassword, err := hashPassword(password)
+	if err != nil {
+		return nil, err
+	}
+
 	return &User{
 		ID:        id,
 		FirstName: firstName,
 		LastName:  lastName,
 		Email:     email,
 		Username:  username,
-		Password:  password,
+		Password:  hashedPassword,
+	}, nil
+}
+
+func hashPassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return "", err
 	}
+	return string(bytes), nil
+}
+
+func checkPasswordHash(password, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err == nil
 }
 
 func GetAllUsers(ctx context.Context, usersCollection *mongo.Collection) ([]User, error) {
