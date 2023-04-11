@@ -3,7 +3,9 @@ package main
 import (
 	"context"
 	"log"
+	"math/rand"
 	"net/http"
+	"time"
 
 	"github.com/DiodeCN/RedDockBackend/register"
 	"github.com/DiodeCN/RedDockBackend/tweet"
@@ -15,6 +17,7 @@ import (
 )
 
 func main() {
+	rand.Seed(time.Now().UnixNano())
 
 	r := gin.Default()
 
@@ -66,6 +69,38 @@ func main() {
 		// 登录成功，将用户信息返回到前端（注意：不要返回密码）
 		sanitizedUser := user.Sanitize()
 		c.JSON(http.StatusOK, sanitizedUser)
+	})
+
+	r.POST("/api/send_VC", func(c *gin.Context) {
+		phoneNumber := c.PostForm("phoneNumber")
+		verificationCode := register.GenerateVerificationCode()
+		err := register.StoreVerificationCodeInDB(ctx, usersCollection, phoneNumber, verificationCode)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to store verification code"})
+			return
+		}
+		register.RegisterSMS([]string{phoneNumber}, []string{verificationCode})
+		c.JSON(http.StatusOK, gin.H{"message": "Verification code sent"})
+	})
+
+	r.POST("/api/register", func(c *gin.Context) {
+		nickname := c.PostForm("nickname")
+		inviter := c.PostForm("inviter")
+		phoneNumber := c.PostForm("phoneNumber")
+		verificationCode := c.PostForm("verificationCode")
+		password := c.PostForm("password")
+
+		registerSuccess, err := register.VerifyAndRegisterUser(ctx, usersCollection, phoneNumber, verificationCode, nickname, inviter, password)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to register user"})
+			return
+		}
+
+		if registerSuccess {
+			c.JSON(http.StatusOK, gin.H{"message": "User registered successfully"})
+		} else {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid verification code"})
+		}
 	})
 
 	if err := r.Run(); err != nil {
