@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/DiodeCN/RedDockBackend/register"
 	"github.com/DiodeCN/RedDockBackend/tweet"
 	"github.com/DiodeCN/RedDockBackend/user"
 	"github.com/gin-contrib/cors"
@@ -67,4 +68,6 @@ func main() {
 	if err := r.Run(); err != nil {
 		log.Fatal(err)
 	}
+
+	register.JustSendASMS()
 }
