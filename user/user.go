@@ -47,6 +47,10 @@ func checkPasswordHash(password, hash string) bool {
 	return err == nil
 }
 
+func ValidateUserPassword(user *User, password string) bool {
+	return checkPasswordHash(password, user.Password)
+}
+
 func GetAllUsers(ctx context.Context, usersCollection *mongo.Collection) ([]User, error) {
 	reqCtx, reqCancel := context.WithCancel(ctx)
 	defer reqCancel()
@@ -59,13 +63,16 @@ func GetAllUsers(ctx context.Context, usersCollection *mongo.Collection) ([]User
 
 	// If the collection is empty, insert a default user
 	if count == 0 {
-		defaultUser := User{
-			ID:        "default1",
-			FirstName: "Default",
-			LastName:  "User",
-			Email:     "default@example.com",
-			Username:  "default_user",
-			Password:  "password", // 注意：实际应用中应使用加密存储密码
+		defaultUser, err := NewUser(
+			"default1",
+			"Default",
+			"User",
+			"default@example.com",
+			"default_user",
+			"password",
+		)
+		if err != nil {
+			return nil, err
 		}
 
 		_, err = usersCollection.InsertOne(reqCtx, defaultUser)
