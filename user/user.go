@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"log"
+	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -10,27 +11,37 @@ import (
 )
 
 type User struct {
-	ID        string `json:"id" bson:"id"`
-	FirstName string `json:"first_name" bson:"first_name"`
-	LastName  string `json:"last_name" bson:"last_name"`
-	Email     string `json:"email" bson:"email"`
-	Username  string `json:"username" bson:"username"`
-	Password  string `json:"-" bson:"password"` // 不返回密码，仅在数据库中存储
+	ID           string    `json:"id" bson:"id"`
+	FirstName    string    `json:"first_name" bson:"first_name"`
+	LastName     string    `json:"last_name" bson:"last_name"`
+	Email        string    `json:"email" bson:"email"`
+	Username     string    `json:"username" bson:"username"`
+	Password     string    `json:"-" bson:"password"`
+	Phone        string    `json:"phone" bson:"phone"`
+	InviteCode   string    `json:"invite_code" bson:"invite_code"`
+	InvitedBy    string    `json:"invited_by" bson:"invited_by"`
+	Nickname     string    `json:"nickname" bson:"nickname"`
+	Registration time.Time `json:"registration" bson:"registration"`
 }
 
-func NewUser(id, firstName, lastName, email, username, password string) (*User, error) {
+func NewUser(id, firstName, lastName, email, username, password, phone, inviteCode, invitedBy, nickname string, registration time.Time) (*User, error) {
 	hashedPassword, err := hashPassword(password)
 	if err != nil {
 		return nil, err
 	}
 
 	return &User{
-		ID:        id,
-		FirstName: firstName,
-		LastName:  lastName,
-		Email:     email,
-		Username:  username,
-		Password:  hashedPassword,
+		ID:           id,
+		FirstName:    firstName,
+		LastName:     lastName,
+		Email:        email,
+		Username:     username,
+		Password:     hashedPassword,
+		Phone:        phone,
+		InviteCode:   inviteCode,
+		InvitedBy:    invitedBy,
+		Nickname:     nickname,
+		Registration: registration,
 	}, nil
 }
 
