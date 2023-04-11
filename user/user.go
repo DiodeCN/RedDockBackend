@@ -62,6 +62,29 @@ func ValidateUserPassword(user *User, password string) bool {
 	return checkPasswordHash(password, user.Password)
 }
 
+func AuthenticateUser(ctx context.Context, usersCollection *mongo.Collection, email, password string) (*User, bool) {
+	reqCtx, reqCancel := context.WithCancel(ctx)
+	defer reqCancel()
+
+	filter := bson.M{"email": email}
+
+	var foundUser User
+	err := usersCollection.FindOne(reqCtx, filter).Decode(&foundUser)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, false
+		}
+		log.Printf("Error finding user: %v", err)
+		return nil, false
+	}
+
+	if checkPasswordHash(password, foundUser.Password) {
+		return &foundUser, true
+	}
+
+	return nil, false
+}
+
 func GetAllUsers(ctx context.Context, usersCollection *mongo.Collection) ([]User, error) {
 	reqCtx, reqCancel := context.WithCancel(ctx)
 	defer reqCancel()
