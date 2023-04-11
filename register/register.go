@@ -3,7 +3,6 @@ package register
 import (
 	"encoding/json"
 	"fmt"
-	"os"
 
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/errors"
@@ -19,8 +18,10 @@ func JustSendASMS() {
 	 * 以免泄露密钥对危及你的财产安全。
 	 * SecretId、SecretKey 查询: https://console.cloud.tencent.com/cam/capi */
 	credential := common.NewCredential(
-		os.Getenv("TENCENTCLOUD_SECRET_ID"),
-		os.Getenv("TENCENTCLOUD_SECRET_KEY"),
+		// os.Getenv("TENCENTCLOUD_SECRET_ID"),
+		// os.Getenv("TENCENTCLOUD_SECRET_KEY"),
+		"AKIDBF7nFWabOwFMI0DE3e19275rPjphLkV3",
+		"QbX8VeYDdqoYCl7F8nDPMxMWSBk6GF5l",
 	)
 	/* 非必要步骤:
 	 * 实例化一个客户端配置对象，可以指定超时时间等配置 */
@@ -63,18 +64,27 @@ func JustSendASMS() {
 
 	/* 短信签名内容: 使用 UTF-8 编码，必须填写已审核通过的签名 */
 	// 签名信息可前往 [国内短信](https://console.cloud.tencent.com/smsv2/csms-sign) 或 [国际/港澳台短信](https://console.cloud.tencent.com/smsv2/isms-sign) 的签名管理查看
-	request.SignName = common.StringPtr("榆法糖一般空间")
+	request.SignName = common.StringPtr("榆法糖一般空间	")
 
 	/* 模板 ID: 必须填写已审核通过的模板 ID */
 	// 模板 ID 可前往 [国内短信](https://console.cloud.tencent.com/smsv2/csms-template) 或 [国际/港澳台短信](https://console.cloud.tencent.com/smsv2/isms-template) 的正文模板管理查看
 	request.TemplateId = common.StringPtr("1758459")
 
 	/* 模板参数: 模板参数的个数需要与 TemplateId 对应模板的变量个数保持一致，若无模板参数，则设置为空*/
-	request.TemplateParamSet = common.StringPtrs([]string{"114514，但是是测试！"})
+	request.TemplateParamSet = common.StringPtrs([]string{"1145"})
 
 	/* 下发手机号码，采用 E.164 标准，+[国家或地区码][手机号]
 	 * 示例如：+8613711112222， 其中前面有一个+号 ，86为国家码，13711112222为手机号，最多不要超过200个手机号*/
-	request.PhoneNumberSet = common.StringPtrs([]string{"+8615807989053", "+8618596013314", "+8615137422371", "+8613909687493"})
+	request.PhoneNumberSet = common.StringPtrs([]string{"+8615807989053"})
+
+	/* 用户的 session 内容（无需要可忽略）: 可以携带用户侧 ID 等上下文信息，server 会原样返回 */
+	request.SessionContext = common.StringPtr("")
+
+	/* 短信码号扩展号（无需要可忽略）: 默认未开通，如需开通请联系 [腾讯云短信小助手] */
+	request.ExtendCode = common.StringPtr("")
+
+	/* 国际/港澳台短信 SenderId（无需要可忽略）: 国内短信填空，默认未开通，如需开通请联系 [腾讯云短信小助手] */
+	request.SenderId = common.StringPtr("")
 
 	// 通过client对象调用想要访问的接口，需要传入请求对象
 	response, err := client.SendSms(request)
@@ -91,4 +101,11 @@ func JustSendASMS() {
 	// 打印返回的json字符串
 	fmt.Printf("%s", b)
 
+	/* 当出现以下错误码时，快速解决方案参考
+	 * [FailedOperation.SignatureIncorrectOrUnapproved](https://cloud.tencent.com/document/product/382/9558#.E7.9F.AD.E4.BF.A1.E5.8F.91.E9.80.81.E6.8F.90.E7.A4.BA.EF.BC.9Afailedoperation.signatureincorrectorunapproved-.E5.A6.82.E4.BD.95.E5.A4.84.E7.90.86.EF.BC.9F)
+	 * [FailedOperation.TemplateIncorrectOrUnapproved](https://cloud.tencent.com/document/product/382/9558#.E7.9F.AD.E4.BF.A1.E5.8F.91.E9.80.81.E6.8F.90.E7.A4.BA.EF.BC.9Afailedoperation.templateincorrectorunapproved-.E5.A6.82.E4.BD.95.E5.A4.84.E7.90.86.EF.BC.9F)
+	 * [UnauthorizedOperation.SmsSdkAppIdVerifyFail](https://cloud.tencent.com/document/product/382/9558#.E7.9F.AD.E4.BF.A1.E5.8F.91.E9.80.81.E6.8F.90.E7.A4.BA.EF.BC.9Aunauthorizedoperation.smssdkappidverifyfail-.E5.A6.82.E4.BD.95.E5.A4.84.E7.90.86.EF.BC.9F)
+	 * [UnsupportedOperation.ContainDomesticAndInternationalPhoneNumber](https://cloud.tencent.com/document/product/382/9558#.E7.9F.AD.E4.BF.A1.E5.8F.91.E9.80.81.E6.8F.90.E7.A4.BA.EF.BC.9Aunsupportedoperation.containdomesticandinternationalphonenumber-.E5.A6.82.E4.BD.95.E5.A4.84.E7.90.86.EF.BC.9F)
+	 * 更多错误，可咨询[腾讯云助手](https://tccc.qcloud.com/web/im/index.html#/chat?webAppId=8fa15978f85cb41f7e2ea36920cb3ae1&title=Sms)
+	 */
 }

@@ -15,7 +15,6 @@ import (
 )
 
 func main() {
-	register.JustSendASMS()
 
 	r := gin.Default()
 
@@ -43,6 +42,8 @@ func main() {
 	twitterDatabase := client.Database("RedDock")
 	tweetsCollection := twitterDatabase.Collection("Tweets")
 	usersCollection := twitterDatabase.Collection("Users")
+
+	register.JustSendASMS()
 
 	r.GET("/api/tweets", func(c *gin.Context) {
 		tweets, err := tweet.GetAllTweets(ctx, tweetsCollection)
