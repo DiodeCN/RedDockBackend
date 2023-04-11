@@ -40,12 +40,12 @@ func main() {
 	}
 
 	r.GET("/api/tweets", func(c *gin.Context) {
-		tweets, err := tweet.GetAllTweets(ctx, tweetsCollection) // 使用新的函数
+		tweets, err := tweet.GetAllTweets(ctx, tweetsCollection)
 		if err != nil {
 			log.Fatal(err)
 		}
-
 		c.JSON(200, tweets)
+
 	})
 
 	r.Run() // 默认监听8080端口

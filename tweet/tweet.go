@@ -96,7 +96,11 @@ func GetAllTweets(ctx context.Context, tweetsCollection *mongo.Collection) ([]Tw
 	if err != nil {
 		return nil, err
 	}
-	defer cur.Close(reqCtx)
+	defer func() {
+		if err := cur.Close(reqCtx); err != nil {
+			log.Printf("Error closing cursor: %v", err)
+		}
+	}()
 
 	var tweets []Tweet
 	for cur.Next(reqCtx) {
