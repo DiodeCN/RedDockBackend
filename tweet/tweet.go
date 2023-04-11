@@ -40,57 +40,40 @@ func (t *Tweet) UpdateFavorites(n int) {
 	t.Favorites += n
 }
 
-func GetTweets(tweetsCollection *mongo.Collection) []Tweet {
-	reqCtx, reqCancel := context.WithTimeout(context.Background(), 10*time.Second)
+func GetAllTweets(ctx context.Context, tweetsCollection *mongo.Collection) ([]Tweet, error) {
+	reqCtx, reqCancel := context.WithTimeout(ctx, 5*time.Second)
 	defer reqCancel()
 
 	// Check if the collection is empty
 	count, err := tweetsCollection.CountDocuments(reqCtx, bson.D{})
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
-	// If the collection is empty, insert a new "helloworld" tweet
+	// If the collection is empty, insert default tweets
 	if count == 0 {
-		helloTweet := NewTweet(
-			"你好世界！",
-			"他妈的",
-			"helloworld",
-			"如果你看到这个东西，说明数据库已经被remade了。",
-		)
+		defaultTweets := []Tweet{
+			{
+				ID:        "default1",
+				Name:      "Default User 1",
+				AvatarURL: "https://example.com/avatar1.png",
+				Content:   "This is a default tweet from Default User 1.",
+			},
+			{
+				ID:        "default2",
+				Name:      "Default User 2",
+				AvatarURL: "https://example.com/avatar2.png",
+				Content:   "This is another default tweet from Default User 2.",
+			},
+		}
 
-		_, err = tweetsCollection.InsertOne(reqCtx, helloTweet)
-		if err != nil {
-			log.Fatal(err)
+		for _, tweet := range defaultTweets {
+			_, err = tweetsCollection.InsertOne(reqCtx, tweet)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
-
-	cur, err := tweetsCollection.Find(reqCtx, bson.D{})
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer cur.Close(reqCtx)
-
-	var tweets []Tweet
-	for cur.Next(reqCtx) {
-		var tweet Tweet
-		err := cur.Decode(&tweet)
-		if err != nil {
-			log.Fatal(err)
-		}
-		tweets = append(tweets, tweet)
-	}
-	if err := cur.Err(); err != nil {
-
-		log.Fatal(err)
-	}
-
-	return tweets
-}
-
-func GetAllTweets(ctx context.Context, tweetsCollection *mongo.Collection) ([]Tweet, error) {
-	reqCtx, reqCancel := context.WithTimeout(ctx, 5*time.Second)
-	defer reqCancel()
 
 	cur, err := tweetsCollection.Find(reqCtx, bson.D{})
 	if err != nil {
