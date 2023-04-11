@@ -43,7 +43,7 @@ func main() {
 	tweetsCollection := twitterDatabase.Collection("Tweets")
 	usersCollection := twitterDatabase.Collection("Users")
 
-	register.JustSendASMS()
+	register.RegisterSMS([]string{"+8615807989053"}, []string{"1758459"})
 
 	r.GET("/api/tweets", func(c *gin.Context) {
 		tweets, err := tweet.GetAllTweets(ctx, tweetsCollection)
