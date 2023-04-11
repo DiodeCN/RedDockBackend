@@ -3,7 +3,6 @@ package tweet
 import (
 	"context"
 	"log"
-	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -41,8 +40,12 @@ func (t *Tweet) UpdateFavorites(n int) {
 }
 
 func GetAllTweets(ctx context.Context, tweetsCollection *mongo.Collection) ([]Tweet, error) {
-	reqCtx, reqCancel := context.WithTimeout(ctx, 5*time.Second)
+	reqCtx, reqCancel := context.WithCancel(ctx)
 	defer reqCancel()
+
+	// ... 执行其他操作
+
+	// 在需要取消操作时调用 reqCancel()
 
 	// Check if the collection is empty
 	count, err := tweetsCollection.CountDocuments(reqCtx, bson.D{})
