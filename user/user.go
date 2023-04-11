@@ -75,12 +75,17 @@ func GetAllUsers(ctx context.Context, usersCollection *mongo.Collection) ([]User
 	// If the collection is empty, insert a default user
 	if count == 0 {
 		defaultUser, err := NewUser(
-			"default1",
-			"Default",
-			"User",
-			"default@example.com",
-			"default_user",
+			"unique_id_1",
+			"John",
+			"Doe",
+			"john.doe@example.com",
+			"john_doe",
 			"password",
+			"555-555-1234",
+			"invite_123",
+			"invite_456",
+			"johnny",
+			time.Now(),
 		)
 		if err != nil {
 			return nil, err

@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/DiodeCN/RedDockBackend/tweet"
+	"github.com/DiodeCN/RedDockBackend/user"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -37,6 +38,7 @@ func main() {
 
 	twitterDatabase := client.Database("RedDock")
 	tweetsCollection := twitterDatabase.Collection("Tweets")
+	usersCollection := client.Database("RedDock").Collection("Users")
 
 	r.GET("/api/tweets", func(c *gin.Context) {
 		tweets, err := tweet.GetAllTweets(ctx, tweetsCollection)
@@ -44,6 +46,16 @@ func main() {
 			log.Fatal(err)
 		}
 		c.JSON(200, tweets)
+
+	})
+
+	r.GET("/api/users", func(c *gin.Context) {
+		allUsers, err := user.GetAllUsers(context.Background(), usersCollection)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		c.JSON(200, allUsers)
 
 	})
 
