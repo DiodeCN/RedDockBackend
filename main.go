@@ -18,12 +18,10 @@ import (
 
 func main() {
 	rand.Seed(time.Now().UnixNano())
-
+	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
-
 	// 添加CORS中间件，允许来自所有域的请求
 	r.Use(cors.Default())
-
 	ctx := context.Background()
 
 	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017"))
