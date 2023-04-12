@@ -21,6 +21,14 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+type RegisterRequestData struct {
+	Nickname         string `json:"nickname"`
+	Inviter          string `json:"inviter"`
+	PhoneNumber      string `json:"phoneNumber"`
+	VerificationCode string `json:"verificationCode"`
+	Password         string `json:"password"`
+}
+
 // GenerateVerificationCode generates a random 6-digit verification code
 func GenerateVerificationCode() string {
 	return fmt.Sprintf("%06d", rand.Intn(1000000))
@@ -36,15 +44,25 @@ func StoreVerificationCodeInDB(ctx context.Context, usersCollection *mongo.Colle
 	return err
 }
 
-// VerifyAndRegisterUser verifies the provided verification code and registers the user if it matches
 func VerifyAndRegisterUser(ctx context.Context, usersCollection *mongo.Collection, phoneNumber, verificationCode, nickname, inviter, password string) (bool, error) {
 	filter := bson.M{"phoneNumber": phoneNumber}
 	user := bson.M{}
 	err := usersCollection.FindOne(ctx, filter).Decode(&user)
 	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			// 用户不存在，创建一个新用户
+			newUser := bson.M{"phoneNumber": phoneNumber, "verificationCode": verificationCode, "nickname": nickname, "inviter": inviter, "password": password, "createdAt": time.Now()}
+			_, err := usersCollection.InsertOne(ctx, newUser)
+			if err != nil {
+				return false, err
+			}
+			return true, nil
+		}
+		// 其他类型的错误
 		return false, err
 	}
 
+	// 用户已存在，检查验证码是否正确
 	if user["verificationCode"] == verificationCode {
 		update := bson.M{"$set": bson.M{"nickname": nickname, "inviter": inviter, "password": password}}
 		_, err = usersCollection.UpdateOne(ctx, filter, update)
@@ -59,11 +77,18 @@ func VerifyAndRegisterUser(ctx context.Context, usersCollection *mongo.Collectio
 
 func RegisterHandler(usersCollection *mongo.Collection) func(c *gin.Context) {
 	return func(c *gin.Context) {
-		nickname := c.PostForm("nickname")
-		inviter := c.PostForm("inviter")
-		phoneNumber := c.PostForm("phoneNumber")
-		verificationCode := c.PostForm("verificationCode")
-		password := c.PostForm("password")
+		var requestData RegisterRequestData
+
+		if err := c.BindJSON(&requestData); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Bad request"})
+			return
+		}
+
+		nickname := requestData.Nickname
+		inviter := requestData.Inviter
+		phoneNumber := requestData.PhoneNumber
+		verificationCode := requestData.VerificationCode
+		password := requestData.Password
 
 		// Add logging statements to print the received form data
 		log.Printf("Form data received: nickname=%s, inviter=%s, phoneNumber=%s, verificationCode=%s, password=%s\n", nickname, inviter, phoneNumber, verificationCode, password)
