@@ -82,7 +82,7 @@ func RegisterSMS(phoneNumberSet []string, templateParamSet []string) {
 
 	request.SmsSdkAppId = common.StringPtr("1400811261")
 	request.SignName = common.StringPtr("榆法糖一般空间")
-	request.TemplateId = common.StringPtr("1758459")
+	request.TemplateId = common.StringPtr("1761760")
 	request.TemplateParamSet = common.StringPtrs(templateParamSet)
 	request.PhoneNumberSet = common.StringPtrs(phoneNumberSet)
 	request.SessionContext = common.StringPtr("")
