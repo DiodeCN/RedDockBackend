@@ -71,37 +71,8 @@ func main() {
 		c.JSON(http.StatusOK, sanitizedUser)
 	})
 
-	r.POST("/api/send_VC", func(c *gin.Context) {
-		phoneNumber := c.PostForm("phoneNumber")
-		verificationCode := register.GenerateVerificationCode()
-		err := register.StoreVerificationCodeInDB(ctx, usersCollection, phoneNumber, verificationCode)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to store verification code"})
-			return
-		}
-		register.RegisterSMS([]string{phoneNumber}, []string{verificationCode})
-		c.JSON(http.StatusOK, gin.H{"message": "Verification code sent"})
-	})
-
-	r.POST("/api/register", func(c *gin.Context) {
-		nickname := c.PostForm("nickname")
-		inviter := c.PostForm("inviter")
-		phoneNumber := c.PostForm("phoneNumber")
-		verificationCode := c.PostForm("verificationCode")
-		password := c.PostForm("password")
-
-		registerSuccess, err := register.VerifyAndRegisterUser(ctx, usersCollection, phoneNumber, verificationCode, nickname, inviter, password)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to register user"})
-			return
-		}
-
-		if registerSuccess {
-			c.JSON(http.StatusOK, gin.H{"message": "User registered successfully"})
-		} else {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid verification code"})
-		}
-	})
+	r.POST("/api/send_VC", register.SendVerificationCodeHandler(usersCollection))
+	r.POST("/api/register", register.RegisterHandler(usersCollection))
 
 	if err := r.Run(); err != nil {
 		log.Fatal(err)

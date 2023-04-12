@@ -78,6 +78,20 @@ func RegisterHandler(usersCollection *mongo.Collection) func(c *gin.Context) {
 	}
 }
 
+func SendVerificationCodeHandler(usersCollection *mongo.Collection) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		phoneNumber := c.PostForm("phoneNumber")
+		verificationCode := GenerateVerificationCode()
+		err := StoreVerificationCodeInDB(context.Background(), usersCollection, phoneNumber, verificationCode)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to store verification code"})
+			return
+		}
+		RegisterSMS([]string{phoneNumber}, []string{verificationCode})
+		c.JSON(http.StatusOK, gin.H{"message": "Verification code sent"})
+	}
+}
+
 func RegisterSMS(phoneNumberSet []string, templateParamSet []string) {
 	viper.SetConfigFile("sth.config")
 	viper.SetConfigType("yaml")
