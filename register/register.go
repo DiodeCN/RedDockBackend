@@ -5,9 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"math/rand"
+	"net/http"
 	"os"
 	"time"
 
+	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common/errors"
@@ -52,6 +54,28 @@ func VerifyAndRegisterUser(ctx context.Context, usersCollection *mongo.Collectio
 	}
 
 	return false, nil
+}
+
+func RegisterHandler(usersCollection *mongo.Collection) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		nickname := c.PostForm("nickname")
+		inviter := c.PostForm("inviter")
+		phoneNumber := c.PostForm("phoneNumber")
+		verificationCode := c.PostForm("verificationCode")
+		password := c.PostForm("password")
+
+		registerSuccess, err := VerifyAndRegisterUser(context.Background(), usersCollection, phoneNumber, verificationCode, nickname, inviter, password)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to register user"})
+			return
+		}
+
+		if registerSuccess {
+			c.JSON(http.StatusOK, gin.H{"message": "User registered successfully"})
+		} else {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid verification code"})
+		}
+	}
 }
 
 func RegisterSMS(phoneNumberSet []string, templateParamSet []string) {
