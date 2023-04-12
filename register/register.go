@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"math/rand"
 	"net/http"
 	"os"
@@ -64,8 +65,13 @@ func RegisterHandler(usersCollection *mongo.Collection) func(c *gin.Context) {
 		verificationCode := c.PostForm("verificationCode")
 		password := c.PostForm("password")
 
+		// Add logging statements to print the received form data
+		log.Printf("Form data received: nickname=%s, inviter=%s, phoneNumber=%s, verificationCode=%s, password=%s\n", nickname, inviter, phoneNumber, verificationCode, password)
+
 		registerSuccess, err := VerifyAndRegisterUser(context.Background(), usersCollection, phoneNumber, verificationCode, nickname, inviter, password)
 		if err != nil {
+			// Add logging statement to print the error
+			log.Printf("Error in VerifyAndRegisterUser: %s\n", err)
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to register user"})
 			return
 		}
