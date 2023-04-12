@@ -80,13 +80,24 @@ func RegisterHandler(usersCollection *mongo.Collection) func(c *gin.Context) {
 
 func SendVerificationCodeHandler(usersCollection *mongo.Collection) func(c *gin.Context) {
 	return func(c *gin.Context) {
-		phoneNumber := c.PostForm("phoneNumber")
+		var requestData struct {
+			PhoneNumber string `json:"phoneNumber"`
+		}
+
+		if err := c.BindJSON(&requestData); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Bad request"})
+			return
+		}
+
+		phoneNumber := requestData.PhoneNumber
 		verificationCode := GenerateVerificationCode()
+
 		err := StoreVerificationCodeInDB(context.Background(), usersCollection, phoneNumber, verificationCode)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to store verification code"})
 			return
 		}
+
 		RegisterSMS([]string{phoneNumber}, []string{verificationCode})
 		c.JSON(http.StatusOK, gin.H{"message": "Verification code sent"})
 	}
