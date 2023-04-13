@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/DiodeCN/RedDockBackend/inviter"
 	"github.com/DiodeCN/RedDockBackend/register"
 	"github.com/DiodeCN/RedDockBackend/tweet"
 	"github.com/DiodeCN/RedDockBackend/user"
@@ -45,6 +46,7 @@ func main() {
 	usersCollection := twitterDatabase.Collection("Users")
 	inviterCollection := client.Database("RedDock").Collection("Inviter")
 
+	inviter.InitializeInviter(ctx, inviterCollection)
 	//register.RegisterSMS([]string{"+8615807989053"}, []string{"114514"})
 
 	r.GET("/api/tweets", func(c *gin.Context) {

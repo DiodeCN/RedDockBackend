@@ -8,7 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func initializeInviter(ctx context.Context, inviterCollection *mongo.Collection) {
+func InitializeInviter(ctx context.Context, inviterCollection *mongo.Collection) {
 	// 检查是否有任何邀请人文档
 	count, err := inviterCollection.CountDocuments(ctx, bson.M{})
 	if err != nil {
