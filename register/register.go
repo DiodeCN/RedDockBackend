@@ -45,18 +45,27 @@ func StoreVerificationCodeInDB(ctx context.Context, usersCollection *mongo.Colle
 }
 
 func VerifyAndRegisterUser(ctx context.Context, usersCollection *mongo.Collection, phoneNumber, verificationCode, nickname, inviter, password string) (bool, error) {
-	filter := bson.M{"phoneNumber": phoneNumber}
-	user := bson.M{}
-	err := usersCollection.FindOne(ctx, filter).Decode(&user)
+	// 检查邀请人是否存在
+	inviterFilter := bson.M{"inviter": inviter}
+	inviterDoc := bson.M{}
+	err := usersCollection.FindOne(ctx, inviterFilter).Decode(&inviterDoc)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-			// 用户不存在，创建一个新用户
-			newUser := bson.M{"phoneNumber": phoneNumber, "verificationCode": verificationCode, "nickname": nickname, "inviter": inviter, "password": password, "createdAt": time.Now()}
-			_, err := usersCollection.InsertOne(ctx, newUser)
-			if err != nil {
-				return false, err
-			}
-			return true, nil
+			// 邀请人不存在
+			return false, fmt.Errorf("inviter not found")
+		}
+		// 其他类型的错误
+		return false, err
+	}
+
+	// 邀请人存在，检查验证码
+	filter := bson.M{"phoneNumber": phoneNumber}
+	user := bson.M{}
+	err = usersCollection.FindOne(ctx, filter).Decode(&user)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			// 用户不存在，但验证码不匹配，则拒绝注册
+			return false, nil
 		}
 		// 其他类型的错误
 		return false, err
@@ -64,12 +73,24 @@ func VerifyAndRegisterUser(ctx context.Context, usersCollection *mongo.Collectio
 
 	// 用户已存在，检查验证码是否正确
 	if user["verificationCode"] == verificationCode {
+		log.Printf("验证码匹配: 提交的验证码=%s, 数据库中的验证码=%s", verificationCode, user["verificationCode"])
+
+		// 更新邀请人的 userscount
+		usersCount := inviterDoc["userscount"].(int) + 1
+		usersCountUpdate := bson.M{"$set": bson.M{"userscount": usersCount}}
+		_, err = usersCollection.UpdateOne(ctx, inviterFilter, usersCountUpdate)
+		if err != nil {
+			return false, err
+		}
+
 		update := bson.M{"$set": bson.M{"nickname": nickname, "inviter": inviter, "password": password}}
 		_, err = usersCollection.UpdateOne(ctx, filter, update)
 		if err != nil {
 			return false, err
 		}
 		return true, nil
+	} else {
+		log.Printf("验证码不匹配: 提交的验证码=%s, 数据库中的验证码=%s", verificationCode, user["verificationCode"])
 	}
 
 	return false, nil
