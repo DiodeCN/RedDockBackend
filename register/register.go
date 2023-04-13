@@ -75,6 +75,12 @@ func VerifyAndRegisterUser(ctx context.Context, usersCollection *mongo.Collectio
 	if user["verificationCode"] == verificationCode {
 		log.Printf("验证码匹配: 提交的验证码=%s, 数据库中的验证码=%s", verificationCode, user["verificationCode"])
 
+		// 检查用户是否已经设置了昵称、邀请人和密码
+		if user["nickname"] != nil && user["inviter"] != nil && user["password"] != nil {
+			log.Printf("用户已存在，无需重新注册")
+			return false, fmt.Errorf("user already exists")
+		}
+
 		// 更新邀请人的 userscount
 		usersCount := inviterDoc["userscount"].(int) + 1
 		usersCountUpdate := bson.M{"$set": bson.M{"userscount": usersCount}}
