@@ -52,10 +52,10 @@ func VerifyAndRegisterUser(ctx context.Context, usersCollection *mongo.Collectio
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			// 邀请人不存在
-			return false, fmt.Errorf("inviter not found")
+			return false, fmt.Errorf("inviter_not_found")
 		}
 		// 其他类型的错误
-		return false, err
+		return false, fmt.Errorf("database_error")
 	}
 
 	// 邀请人存在，检查验证码
@@ -99,15 +99,16 @@ func VerifyAndRegisterUser(ctx context.Context, usersCollection *mongo.Collectio
 		log.Printf("验证码不匹配: 提交的验证码=%s, 数据库中的验证码=%s", verificationCode, user["verificationCode"])
 	}
 
-	return false, nil
+	return false, fmt.Errorf("invalid_verification_code")
 }
 
+// 修改 RegisterHandler，以便根据 VerifyAndRegisterUser 返回的错误信息设置适当的响应
 func RegisterHandler(usersCollection *mongo.Collection, inviterCollection *mongo.Collection) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		var requestData RegisterRequestData
 
 		if err := c.BindJSON(&requestData); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Bad request"})
+			c.JSON(http.StatusBadRequest, gin.H{"error": "bad_request"})
 			return
 		}
 
@@ -122,16 +123,23 @@ func RegisterHandler(usersCollection *mongo.Collection, inviterCollection *mongo
 
 		registerSuccess, err := VerifyAndRegisterUser(context.Background(), usersCollection, inviterCollection, phoneNumber, verificationCode, nickname, inviter, password)
 		if err != nil {
-			// Add logging statement to print the error
-			log.Printf("Error in VerifyAndRegisterUser: %s\n", err)
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to register user"})
+			var errorType string
+			switch err.Error() {
+			case "inviter_not_found":
+				errorType = "inviter_not_found"
+			case "user_already_exists":
+				errorType = "user_already_exists"
+			case "database_error":
+				errorType = "database_error"
+			default:
+				errorType = "invalid_verification_code"
+			}
+			c.JSON(http.StatusBadRequest, gin.H{"error": errorType})
 			return
 		}
 
 		if registerSuccess {
-			c.JSON(http.StatusOK, gin.H{"message": "User registered successfully"})
-		} else {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid verification code"})
+			c.JSON(http.StatusOK, gin.H{"message": "user_registered_successfully"})
 		}
 	}
 }
