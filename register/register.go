@@ -44,11 +44,11 @@ func StoreVerificationCodeInDB(ctx context.Context, usersCollection *mongo.Colle
 	return err
 }
 
-func VerifyAndRegisterUser(ctx context.Context, usersCollection *mongo.Collection, phoneNumber, verificationCode, nickname, inviter, password string) (bool, error) {
+func VerifyAndRegisterUser(ctx context.Context, usersCollection *mongo.Collection, inviterCollection *mongo.Collection, phoneNumber, verificationCode, nickname, inviter, password string) (bool, error) {
 	// 检查邀请人是否存在
-	inviterFilter := bson.M{"inviter": inviter}
+	inviterFilter := bson.M{"_id": inviter}
 	inviterDoc := bson.M{}
-	err := usersCollection.FindOne(ctx, inviterFilter).Decode(&inviterDoc)
+	err := inviterCollection.FindOne(ctx, inviterFilter).Decode(&inviterDoc)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			// 邀请人不存在
@@ -102,7 +102,7 @@ func VerifyAndRegisterUser(ctx context.Context, usersCollection *mongo.Collectio
 	return false, nil
 }
 
-func RegisterHandler(usersCollection *mongo.Collection) func(c *gin.Context) {
+func RegisterHandler(usersCollection *mongo.Collection, inviterCollection *mongo.Collection) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		var requestData RegisterRequestData
 
@@ -120,7 +120,7 @@ func RegisterHandler(usersCollection *mongo.Collection) func(c *gin.Context) {
 		// Add logging statements to print the received form data
 		log.Printf("Form data received: nickname=%s, inviter=%s, phoneNumber=%s, verificationCode=%s, password=%s\n", nickname, inviter, phoneNumber, verificationCode, password)
 
-		registerSuccess, err := VerifyAndRegisterUser(context.Background(), usersCollection, phoneNumber, verificationCode, nickname, inviter, password)
+		registerSuccess, err := VerifyAndRegisterUser(context.Background(), usersCollection, inviterCollection, phoneNumber, verificationCode, nickname, inviter, password)
 		if err != nil {
 			// Add logging statement to print the error
 			log.Printf("Error in VerifyAndRegisterUser: %s\n", err)

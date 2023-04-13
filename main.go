@@ -43,6 +43,7 @@ func main() {
 	twitterDatabase := client.Database("RedDock")
 	tweetsCollection := twitterDatabase.Collection("Tweets")
 	usersCollection := twitterDatabase.Collection("Users")
+	inviterCollection := client.Database("RedDock").Collection("Inviter")
 
 	//register.RegisterSMS([]string{"+8615807989053"}, []string{"114514"})
 
@@ -70,7 +71,7 @@ func main() {
 	})
 
 	r.POST("/api/send_VC", register.SendVerificationCodeHandler(usersCollection))
-	r.POST("/api/register", register.RegisterHandler(usersCollection))
+	r.POST("/register", register.RegisterHandler(usersCollection, inviterCollection))
 
 	if err := r.Run(":10628"); err != nil {
 		log.Fatal(err)
