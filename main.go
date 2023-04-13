@@ -71,7 +71,7 @@ func main() {
 	})
 
 	r.POST("/api/send_VC", register.SendVerificationCodeHandler(usersCollection))
-	r.POST("/register", register.RegisterHandler(usersCollection, inviterCollection))
+	r.POST("/api/register", register.RegisterHandler(usersCollection, inviterCollection))
 
 	if err := r.Run(":10628"); err != nil {
 		log.Fatal(err)
