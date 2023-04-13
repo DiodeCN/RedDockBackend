@@ -46,7 +46,7 @@ func StoreVerificationCodeInDB(ctx context.Context, usersCollection *mongo.Colle
 
 func VerifyAndRegisterUser(ctx context.Context, usersCollection *mongo.Collection, inviterCollection *mongo.Collection, phoneNumber, verificationCode, nickname, inviter, password string) (bool, error) {
 	// 检查邀请人是否存在
-	inviterFilter := bson.M{"_id": inviter}
+	inviterFilter := bson.M{"inviter": inviter}
 	inviterDoc := bson.M{}
 	err := inviterCollection.FindOne(ctx, inviterFilter).Decode(&inviterDoc)
 	if err != nil {
@@ -82,9 +82,9 @@ func VerifyAndRegisterUser(ctx context.Context, usersCollection *mongo.Collectio
 		}
 
 		// 更新邀请人的 userscount
-		usersCount := inviterDoc["userscount"].(int) + 1
+		usersCount := int(inviterDoc["userscount"].(int32)) + 1
 		usersCountUpdate := bson.M{"$set": bson.M{"userscount": usersCount}}
-		_, err = usersCollection.UpdateOne(ctx, inviterFilter, usersCountUpdate)
+		_, err = inviterCollection.UpdateOne(ctx, inviterFilter, usersCountUpdate) // 修改这里
 		if err != nil {
 			return false, err
 		}
