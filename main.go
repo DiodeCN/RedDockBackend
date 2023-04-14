@@ -5,6 +5,7 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	"os"
 	"path/filepath"
 	"time"
 
@@ -19,6 +20,11 @@ import (
 )
 
 func main() {
+
+	cwd, err := os.Getwd()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	rand.Seed(time.Now().UnixNano())
 	gin.SetMode(gin.ReleaseMode)
@@ -75,11 +81,9 @@ func main() {
 
 	r.POST("/api/send_VC", register.SendVerificationCodeHandler(usersCollection))
 	r.POST("/api/register", register.RegisterHandler(usersCollection, inviterCollection))
-
-	// 更正：将路由处理函数添加到 r 实例
 	r.GET("/api/avatar/:filename", func(c *gin.Context) {
 		filename := c.Param("filename")
-		filePath := filepath.Join("./PictureStorage/Avatar", filename+".png")
+		filePath := filepath.Join(cwd, "PictureStorage", "Avatar", filename+".png")
 
 		c.FileAttachment(filePath, filename+".png")
 	})
