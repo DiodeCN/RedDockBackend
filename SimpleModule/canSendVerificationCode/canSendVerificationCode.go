@@ -1,4 +1,4 @@
-package SimpleModule
+package CanSendVerificationCode
 
 import "time"
 

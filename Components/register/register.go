@@ -10,6 +10,8 @@ import (
 	"os"
 	"time"
 
+	"github.com/DiodeCN/RedDockBackend/SimpleModule/CanSendVerificationCode" // 更新导入路径，以匹配您的 repo
+
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 	"github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/common"
@@ -158,7 +160,7 @@ func SendVerificationCodeHandler(usersCollection *mongo.Collection) func(c *gin.
 		phoneNumber := requestData.PhoneNumber
 		clientIP := c.ClientIP()
 
-		if !SimpleModule.canSendVerificationCode.canSendVerificationCode(clientIP, phoneNumber) {
+		if !CanSendVerificationCode.CanSendVerificationCode(clientIP, phoneNumber) {
 			c.JSON(http.StatusTooManyRequests, gin.H{"error": "Too many requests. Please wait 60 seconds before requesting a new verification code."})
 			return
 		}
