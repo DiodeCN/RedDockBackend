@@ -1,4 +1,4 @@
-package canSendVerificationCode
+package cansendverificationcode
 
 import "time"
 

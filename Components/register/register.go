@@ -156,6 +156,13 @@ func SendVerificationCodeHandler(usersCollection *mongo.Collection) func(c *gin.
 		}
 
 		phoneNumber := requestData.PhoneNumber
+		clientIP := c.ClientIP()
+
+		if !canSendVerificationCode.canSendVerificationCode(clientIP, phoneNumber) {
+			c.JSON(http.StatusTooManyRequests, gin.H{"error": "Too many requests. Please wait 60 seconds before requesting a new verification code."})
+			return
+		}
+
 		verificationCode := GenerateVerificationCode()
 
 		err := StoreVerificationCodeInDB(context.Background(), usersCollection, phoneNumber, verificationCode)
