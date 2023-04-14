@@ -8,7 +8,6 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
-	"time"
 
 	"github.com/DiodeCN/RedDockBackend/SimpleModule/CanSendVerificationCode" // 更新导入路径，以匹配您的 repo
 
@@ -20,7 +19,6 @@ import (
 	sms "github.com/tencentcloud/tencentcloud-sdk-go/tencentcloud/sms/v20210111"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type RegisterRequestData struct {
@@ -34,16 +32,6 @@ type RegisterRequestData struct {
 // GenerateVerificationCode generates a random 6-digit verification code
 func GenerateVerificationCode() string {
 	return fmt.Sprintf("%06d", rand.Intn(1000000))
-}
-
-// StoreVerificationCodeInDB stores the verification code in the MongoDB database
-func StoreVerificationCodeInDB(ctx context.Context, usersCollection *mongo.Collection, phoneNumber, verificationCode string) error {
-	filter := bson.M{"phoneNumber": phoneNumber}
-	update := bson.M{"$set": bson.M{"verificationCode": verificationCode, "createdAt": time.Now()}}
-	opts := options.Update().SetUpsert(true)
-
-	_, err := usersCollection.UpdateOne(ctx, filter, update, opts)
-	return err
 }
 
 func VerifyAndRegisterUser(ctx context.Context, usersCollection *mongo.Collection, inviterCollection *mongo.Collection, phoneNumber, verificationCode, nickname, inviter, password string) (bool, error) {
@@ -160,6 +148,21 @@ func SendVerificationCodeHandler(usersCollection *mongo.Collection) func(c *gin.
 		phoneNumber := requestData.PhoneNumber
 		clientIP := c.ClientIP()
 
+		// 获取用户文档
+		filter := bson.M{"phoneNumber": phoneNumber}
+		user := bson.M{}
+		err := usersCollection.FindOne(context.Background(), filter).Decode(&user)
+
+		if err != nil && err != mongo.ErrNoDocuments {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to retrieve user"})
+			return
+		}
+
+		if user["daycount"] != nil && int(user["daycount"].(int32)) > 5 {
+			c.JSON(http.StatusTooManyRequests, gin.H{"error": "You have reached the daily limit for sending verification codes. Please try again tomorrow."})
+			return
+		}
+
 		if !CanSendVerificationCode.CanSendVerificationCode(clientIP, phoneNumber) {
 			c.JSON(http.StatusTooManyRequests, gin.H{"error": "Too many requests. Please wait 60 seconds before requesting a new verification code."})
 			return
@@ -167,7 +170,7 @@ func SendVerificationCodeHandler(usersCollection *mongo.Collection) func(c *gin.
 
 		verificationCode := GenerateVerificationCode()
 
-		err := StoreVerificationCodeInDB(context.Background(), usersCollection, phoneNumber, verificationCode)
+		err = CanSendVerificationCode.StoreVerificationCodeInDB(context.Background(), usersCollection, phoneNumber, verificationCode)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to store verification code"})
 			return
