@@ -64,7 +64,7 @@ func main() {
 		c.JSON(200, tweets)
 	})
 
-	r.POST("/login", func(c *gin.Context) {
+	r.POST("/api/login", func(c *gin.Context) {
 		email := c.PostForm("email")
 		password := c.PostForm("password")
 
