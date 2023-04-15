@@ -4,15 +4,14 @@ import (
 	"context"
 	"log"
 	"math/rand"
-	"net/http"
 	"os"
 	"path/filepath"
 	"time"
 
 	"github.com/DiodeCN/RedDockBackend/Components/inviter"
+	"github.com/DiodeCN/RedDockBackend/Components/login"
 	"github.com/DiodeCN/RedDockBackend/Components/register"
 	"github.com/DiodeCN/RedDockBackend/Components/tweet"
-	"github.com/DiodeCN/RedDockBackend/Components/user"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -64,23 +63,10 @@ func main() {
 		c.JSON(200, tweets)
 	})
 
-	r.POST("/api/login", func(c *gin.Context) {
-		email := c.PostForm("email")
-		password := c.PostForm("password")
-
-		user, authenticated := user.AuthenticateUser(c.Request.Context(), usersCollection, email, password)
-		if !authenticated {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid email or password"})
-			return
-		}
-
-		// 登录成功，将用户信息返回到前端（注意：不要返回密码）
-		sanitizedUser := user.Sanitize()
-		c.JSON(http.StatusOK, sanitizedUser)
-	})
-
+	r.POST("/api/login", login.HandleLogin)
 	r.POST("/api/send_VC", register.SendVerificationCodeHandler(usersCollection))
 	r.POST("/api/register", register.RegisterHandler(usersCollection, inviterCollection))
+
 	r.GET("/api/avatar/:filename", func(c *gin.Context) {
 		filename := c.Param("filename")
 		filePath := filepath.Join(cwd, "PictureStorage", "Avatar", filename+".png")
