@@ -26,7 +26,6 @@ func HandleLogin(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request data"})
 		return
 	}
-
 	log.Println(loginData)
 
 	decrypted, err := decrypt.Decrypt(loginData.Encrypted)
@@ -35,6 +34,7 @@ func HandleLogin(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Decryption failed"})
 		return
 	}
+	log.Println(decrypted)
 
 	decryptedParts := strings.Split(decrypted, "|")
 	if len(decryptedParts) != 3 {
