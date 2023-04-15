@@ -44,6 +44,7 @@ func Decrypt(encryptedData string) (string, error) {
 
 	// Remove padding
 	unpaddedData := removePadding(ciphertext)
+	log.Println("Decrypted data: ", string(unpaddedData)) // 添加日志输出
 
 	return string(unpaddedData), nil
 }

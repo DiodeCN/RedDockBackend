@@ -20,7 +20,6 @@ type LoginData struct {
 
 func HandleLogin(c *gin.Context) {
 	var loginData LoginData
-	log.Println(loginData)
 
 	err := json.NewDecoder(c.Request.Body).Decode(&loginData)
 	if err != nil {
@@ -28,8 +27,11 @@ func HandleLogin(c *gin.Context) {
 		return
 	}
 
+	log.Println(loginData)
+
 	decrypted, err := decrypt.Decrypt(loginData.Encrypted)
 	if err != nil {
+		log.Println("Error during decryption: ", err) // 添加日志输出
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Decryption failed"})
 		return
 	}
