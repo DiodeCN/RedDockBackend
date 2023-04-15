@@ -6,10 +6,18 @@ import (
 	"encoding/base64"
 	"errors"
 	"log"
+
+	"github.com/joho/godotenv"
+
 	"os"
 )
 
 func Decrypt(encryptedData string) (string, error) {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
 	secretKey := os.Getenv("AES_SECRET_KEY")
 
 	log.Println(secretKey)
