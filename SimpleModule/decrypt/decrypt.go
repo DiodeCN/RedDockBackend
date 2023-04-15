@@ -4,6 +4,7 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"encoding/base64"
+	"errors"
 	"os"
 )
 
@@ -20,7 +21,7 @@ func Decrypt(encryptedData string) (string, error) {
 	}
 
 	if len(ciphertext) < aes.BlockSize {
-		return "", err
+		return "", errors.New("ciphertext too short")
 	}
 
 	iv := ciphertext[:aes.BlockSize]
@@ -29,5 +30,15 @@ func Decrypt(encryptedData string) (string, error) {
 	mode := cipher.NewCBCDecrypter(block, iv)
 	mode.CryptBlocks(ciphertext, ciphertext)
 
-	return string(ciphertext), nil
+	// Remove padding
+	unpaddedData := removePadding(ciphertext)
+
+	return string(unpaddedData), nil
+}
+
+func removePadding(data []byte) []byte {
+	length := len(data)
+	padding := int(data[length-1])
+
+	return data[:(length - padding)]
 }
