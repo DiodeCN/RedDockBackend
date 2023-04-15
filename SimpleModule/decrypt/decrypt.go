@@ -43,15 +43,22 @@ func Decrypt(encryptedData string) (string, error) {
 	mode.CryptBlocks(ciphertext, ciphertext)
 
 	// Remove padding
-	unpaddedData := removePadding(ciphertext)
+	unpaddedData, err := removePadding(ciphertext)
+	if err != nil {
+		return "", err
+	}
 	log.Println("Decrypted data: ", string(unpaddedData)) // 添加日志输出
 
 	return string(unpaddedData), nil
 }
 
-func removePadding(data []byte) []byte {
+func removePadding(data []byte) ([]byte, error) {
 	length := len(data)
 	padding := int(data[length-1])
-	log.Println("Padding value: ", padding) // 添加日志输出
-	return data[:(length - padding)]
+
+	if padding < 1 || padding > aes.BlockSize {
+		return nil, errors.New("invalid padding value")
+	}
+
+	return data[:(length - padding)], nil
 }
