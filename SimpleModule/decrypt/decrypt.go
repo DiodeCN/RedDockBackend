@@ -52,6 +52,6 @@ func Decrypt(encryptedData string) (string, error) {
 func removePadding(data []byte) []byte {
 	length := len(data)
 	padding := int(data[length-1])
-
+	log.Println("Padding value: ", padding) // 添加日志输出
 	return data[:(length - padding)]
 }
