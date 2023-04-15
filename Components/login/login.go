@@ -20,6 +20,8 @@ type LoginData struct {
 
 func HandleLogin(c *gin.Context) {
 	var loginData LoginData
+	log.Println(loginData)
+
 	err := json.NewDecoder(c.Request.Body).Decode(&loginData)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request data"})
