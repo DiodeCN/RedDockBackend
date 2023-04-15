@@ -8,7 +8,7 @@ import (
 )
 
 func Decrypt(encryptedData string) (string, error) {
-	secretKey := os.Getenv("REACT_APP_SECRET_KEY")
+	secretKey := os.Getenv("SECRET_KEY")
 	ciphertext, err := base64.StdEncoding.DecodeString(encryptedData)
 	if err != nil {
 		return "", err
