@@ -44,7 +44,7 @@ func Decrypt(encryptedData string) (string, error) {
 	blockMode := cipher.NewCBCDecrypter(block, iv)
 	paddedData := make([]byte, len(ciphertext))
 	blockMode.CryptBlocks(paddedData, ciphertext)
-	unpaddedData, err := pkcs7.Unpad(paddedData, 8) // 修改为8
+	unpaddedData, err := pkcs7.Unpad(paddedData, 16) // 修改为8
 	if err != nil {
 		return "", err
 	}
