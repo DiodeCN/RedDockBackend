@@ -5,15 +5,29 @@ import (
 	"crypto/cipher"
 	"encoding/base64"
 	"errors"
+	"fmt"
+	"log"
 	"os"
+
+	"github.com/spf13/viper"
 )
 
 func Decrypt(encryptedData string) (string, error) {
-	secretKey := os.Getenv("SECRET_KEY")
+	viper.SetConfigFile("sth.config")
+	viper.SetConfigType("yaml")
+
+	if err := viper.ReadInConfig(); err != nil {
+		fmt.Printf("Error reading config file: %s\n", err)
+		os.Exit(1)
+	}
+
+	secretKey := os.Getenv("AES_SECRET_KEY")
 	ciphertext, err := base64.StdEncoding.DecodeString(encryptedData)
 	if err != nil {
 		return "", err
 	}
+
+	log.Println(secretKey)
 
 	block, err := aes.NewCipher([]byte(secretKey))
 	if err != nil {
