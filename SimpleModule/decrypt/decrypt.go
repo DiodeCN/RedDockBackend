@@ -7,9 +7,10 @@ import (
 	"errors"
 	"log"
 
-	"github.com/joho/godotenv"
-
 	"os"
+
+	"github.com/joho/godotenv"
+	"github.com/mergermarket/go-pkcs7"
 )
 
 func Decrypt(encryptedData string) (string, error) {
@@ -39,26 +40,16 @@ func Decrypt(encryptedData string) (string, error) {
 	iv := ciphertext[:aes.BlockSize]
 	ciphertext = ciphertext[aes.BlockSize:]
 
-	mode := cipher.NewCBCDecrypter(block, iv)
-	mode.CryptBlocks(ciphertext, ciphertext)
-
-	// Remove padding
-	unpaddedData, err := removePadding(ciphertext)
+	// Use PKCS#5 padding
+	blockMode := cipher.NewCBCDecrypter(block, iv)
+	paddedData := make([]byte, len(ciphertext))
+	blockMode.CryptBlocks(paddedData, ciphertext)
+	unpaddedData, err := pkcs7.Unpad(paddedData, 8) // 修改为8
 	if err != nil {
 		return "", err
 	}
+
 	log.Println("Decrypted data: ", string(unpaddedData)) // 添加日志输出
 
 	return string(unpaddedData), nil
-}
-
-func removePadding(data []byte) ([]byte, error) {
-	length := len(data)
-	padding := int(data[length-1])
-
-	if padding < 1 || padding > aes.BlockSize {
-		return nil, errors.New("invalid padding value")
-	}
-
-	return data[:(length - padding)], nil
 }
