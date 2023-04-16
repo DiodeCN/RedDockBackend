@@ -3,7 +3,6 @@ package login
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"strings"
@@ -33,12 +32,14 @@ func HandleLogin(usersCollection *mongo.Collection) func(c *gin.Context) {
 		}
 		log.Println(loginData)
 
-		encrypted, err := crypt.Encrypt("nihao")
-		if err != nil {
-			fmt.Println("Encryption error:", err)
-			return
-		}
-		fmt.Println("Encrypted data:", encrypted)
+		/*
+			encrypted, err := crypt.Encrypt("nihao")
+			if err != nil {
+				fmt.Println("Encryption error:", err)
+				return
+			}
+			fmt.Println("Encrypted data:", encrypted)
+		*/
 
 		decrypted, err := crypt.Decrypt(loginData.Encrypted)
 		if err != nil {
@@ -46,7 +47,6 @@ func HandleLogin(usersCollection *mongo.Collection) func(c *gin.Context) {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Decryption failed"})
 			return
 		}
-		log.Println(decrypted)
 
 		decryptedParts := strings.Split(decrypted, "|")
 		if len(decryptedParts) != 3 {

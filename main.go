@@ -14,12 +14,12 @@ import (
 	"github.com/DiodeCN/RedDockBackend/Components/tweet"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func main() {
-
 	cwd, err := os.Getwd()
 	if err != nil {
 		log.Fatal(err)
@@ -52,6 +52,14 @@ func main() {
 	tweetsCollection := twitterDatabase.Collection("Tweets")
 	usersCollection := twitterDatabase.Collection("Users")
 	inviterCollection := client.Database("RedDock").Collection("Inviter")
+
+	err = godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
+	secretKey := os.Getenv("AES_SECRET_KEY")
+	log.Println("当前AES密钥：", secretKey)
 
 	inviter.InitializeInviter(ctx, inviterCollection)
 

@@ -21,7 +21,10 @@ func Decrypt(encryptedData string) (string, error) {
 	}
 
 	secretKey := os.Getenv("AES_SECRET_KEY")
-	log.Println(secretKey)
+	block, err := aes.NewCipher([]byte(secretKey))
+	if err != nil {
+		return "", err
+	}
 
 	ciphertext, err := base64.StdEncoding.DecodeString(encryptedData)
 	if err != nil {
@@ -35,16 +38,11 @@ func Decrypt(encryptedData string) (string, error) {
 	iv := ciphertext[:aes.BlockSize]
 	ciphertext = ciphertext[aes.BlockSize:]
 
-	block, err := aes.NewCipher([]byte(secretKey))
-	if err != nil {
-		return "", err
-	}
-
 	blockMode := cipher.NewCBCDecrypter(block, iv)
 	paddedData := make([]byte, len(ciphertext))
 	blockMode.CryptBlocks(paddedData, ciphertext)
 
-	log.Println("Padded data: ", paddedData)
+	//log.Println("Padded data: ", paddedData)
 
 	if len(paddedData)%16 != 0 {
 		return "", errors.New("padded data length is not a multiple of 16")
@@ -55,7 +53,7 @@ func Decrypt(encryptedData string) (string, error) {
 		return "", err
 	}
 
-	log.Println("Decrypted data: ", string(unpaddedData))
+	log.Println("解密数据: ", string(unpaddedData))
 
 	return string(unpaddedData), nil
 }
