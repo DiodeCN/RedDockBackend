@@ -54,12 +54,13 @@ func HandleLogin(usersCollection *mongo.Collection) func(c *gin.Context) {
 			return
 		}
 
-		if decryptedParts[0] == loginData.Timestamp && decryptedParts[1] == loginData.Email && decryptedParts[2] == loginData.Password {
-			log.Println("牛逼")
-			c.JSON(http.StatusOK, gin.H{"message": "登录成功"})
-		} else {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
-		}
+		// 删除以下代码段
+		// if decryptedParts[0] == loginData.Timestamp && decryptedParts[1] == loginData.Email && decryptedParts[2] == loginData.Password {
+		// 	log.Println("牛逼")
+		// 	c.JSON(http.StatusOK, gin.H{"message": "登录成功"})
+		// } else {
+		// 	c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
+		// }
 
 		// 查询用户
 		filter := bson.M{"phoneNumber": loginData.Email}
@@ -75,11 +76,11 @@ func HandleLogin(usersCollection *mongo.Collection) func(c *gin.Context) {
 			return
 		}
 
-		// 验证密码
-		if user["password"] == loginData.Password {
+		// 验证密码以及解密后的信息
+		if user["password"] == loginData.Password && decryptedParts[0] == loginData.Timestamp && decryptedParts[1] == loginData.Email && decryptedParts[2] == loginData.Password {
 			c.JSON(http.StatusOK, gin.H{"message": "登录成功"})
 		} else {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid password"})
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid password or credentials"})
 		}
 	}
 }
