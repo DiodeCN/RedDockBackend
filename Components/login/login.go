@@ -28,7 +28,7 @@ func HandleLogin(c *gin.Context) {
 	}
 	log.Println(loginData)
 
-	decrypted, err := decrypt.Decrypt(loginData.Encrypted)
+	decrypted, err := decrypt.Decrypt("U2FsdGVkX1+3k8kNTvaSO7Me+owuAqwdVXM+xDNpG6I=")
 	if err != nil {
 		log.Println("Error during decryption: ", err) // 添加日志输出
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Decryption failed"})
