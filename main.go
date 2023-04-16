@@ -63,7 +63,7 @@ func main() {
 		c.JSON(200, tweets)
 	})
 
-	r.POST("/api/login", login.HandleLogin)
+	r.POST("/api/login", login.HandleLogin(usersCollection))
 	r.POST("/api/send_VC", register.SendVerificationCodeHandler(usersCollection))
 	r.POST("/api/register", register.RegisterHandler(usersCollection, inviterCollection))
 
