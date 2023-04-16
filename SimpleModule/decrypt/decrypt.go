@@ -6,7 +6,6 @@ import (
 	"encoding/base64"
 	"errors"
 	"log"
-
 	"os"
 
 	"github.com/joho/godotenv"
