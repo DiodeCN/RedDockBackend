@@ -12,6 +12,8 @@ import (
 	"github.com/DiodeCN/RedDockBackend/Components/login"
 	"github.com/DiodeCN/RedDockBackend/Components/register"
 	"github.com/DiodeCN/RedDockBackend/Components/tweet"
+
+	// iwantatoken "github.com/DiodeCN/RedDockBackend/SimpleModule/iWantAToken"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -48,6 +50,7 @@ func main() {
 		}
 	}()
 
+	// log.Println(iwantatoken.EncryptFile("ddd"))
 	twitterDatabase := client.Database("RedDock")
 	tweetsCollection := twitterDatabase.Collection("Tweets")
 	usersCollection := twitterDatabase.Collection("Users")

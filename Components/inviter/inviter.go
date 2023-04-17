@@ -3,6 +3,8 @@ package inviter
 import (
 	"context"
 	"log"
+	"math/rand"
+	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -17,8 +19,12 @@ func InitializeInviter(ctx context.Context, inviterCollection *mongo.Collection)
 
 	// 如果没有邀请人文档，创建一个新的邀请人
 	if count == 0 {
+		// 生成一个随机的八位字符串
+		rand.Seed(time.Now().UnixNano())
+		inviterID := "#" + randString(8)
+
 		defaultInviter := bson.M{
-			"inviter":    "#19890six0four",
+			"inviter":    inviterID,
 			"userscount": 0,
 		}
 
@@ -27,6 +33,15 @@ func InitializeInviter(ctx context.Context, inviterCollection *mongo.Collection)
 			log.Fatalf("Failed to insert default inviter: %v", err)
 		}
 
-		log.Println("Inserted default inviter: #19890six0four")
+		log.Println("Inserted default inviter:", inviterID)
 	}
+}
+
+func randString(length int) string {
+	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	b := make([]byte, length)
+	for i := range b {
+		b[i] = charset[rand.Intn(len(charset))]
+	}
+	return string(b)
 }
