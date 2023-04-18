@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"strings"
 
-	crypt "github.com/DiodeCN/RedDockBackend/SimpleModule/crypt"
+	crypt "github.com/DiodeCN/RedDockBackend/SimpleModule/cryptIt"
 	"github.com/DiodeCN/RedDockBackend/SimpleModule/iwantatoken"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"

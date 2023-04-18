@@ -1,4 +1,4 @@
-package decrypt
+package cryptIt
 
 import (
 	"crypto/aes"
