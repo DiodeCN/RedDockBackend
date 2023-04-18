@@ -2,6 +2,7 @@ package isTokenOK
 
 import (
 	"context"
+	"log"
 	"strings"
 
 	"github.com/DiodeCN/RedDockBackend/SimpleModule/iwantatoken"
@@ -51,6 +52,8 @@ func IsUserValidByToken(token string, usersCollection *mongo.Collection) bool {
 	if err != nil {
 		return false
 	}
+
+	log.Println(decryptedToken)
 
 	phoneNumber := strings.Split(decryptedToken, "|")[0]
 
