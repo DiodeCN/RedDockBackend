@@ -13,7 +13,8 @@ import (
 	"github.com/DiodeCN/RedDockBackend/Components/register"
 	"github.com/DiodeCN/RedDockBackend/Components/tweet"
 
-	// iwantatoken "github.com/DiodeCN/RedDockBackend/SimpleModule/iWantAToken"
+	// iwantatoken "github.com/DiodeCN/RedDockBackend/SimpleModule/iwantatoken"
+	"github.com/DiodeCN/RedDockBackend/SimpleModule/isTokenOK"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -77,6 +78,7 @@ func main() {
 	r.POST("/api/login", login.HandleLogin(usersCollection))
 	r.POST("/api/send_VC", register.SendVerificationCodeHandler(usersCollection))
 	r.POST("/api/register", register.RegisterHandler(usersCollection, inviterCollection))
+	r.POST("/api/token", isTokenOK.TokenHandler(usersCollection))
 
 	r.GET("/api/avatar/:filename", func(c *gin.Context) {
 		filename := c.Param("filename")

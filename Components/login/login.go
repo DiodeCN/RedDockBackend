@@ -8,13 +8,11 @@ import (
 	"strings"
 
 	crypt "github.com/DiodeCN/RedDockBackend/SimpleModule/crypt"
+	"github.com/DiodeCN/RedDockBackend/SimpleModule/iwantatoken"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 
 	"github.com/gin-gonic/gin"
-
-	"github.com/DiodeCN/RedDockBackend/SimpleModule/iwantatoken"
-
 )
 
 type LoginData struct {
@@ -83,7 +81,7 @@ func HandleLogin(usersCollection *mongo.Collection) func(c *gin.Context) {
 		if user["password"] == loginData.Password && decryptedParts[0] == loginData.Timestamp && decryptedParts[1] == loginData.Email && decryptedParts[2] == loginData.Password {
 			// 创建Token字符串
 			tokenString := loginData.Email + "|" + loginData.Timestamp
-		
+
 			// 使用iwantatoken加密Token
 			secretKey := []byte(iwantatoken.GetTokenSecretKey())
 			encryptedToken, err := iwantatoken.Encrypt(tokenString, secretKey)
@@ -92,7 +90,7 @@ func HandleLogin(usersCollection *mongo.Collection) func(c *gin.Context) {
 				c.JSON(http.StatusInternalServerError, gin.H{"error": "Token encryption failed"})
 				return
 			}
-		
+
 			// 返回登录成功信息和加密Token
 			c.JSON(http.StatusOK, gin.H{"message": "登录成功", "token": encryptedToken})
 		} else {
