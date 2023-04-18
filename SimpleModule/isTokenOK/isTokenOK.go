@@ -44,3 +44,22 @@ func TokenHandler(usersCollection *mongo.Collection) gin.HandlerFunc {
 		}
 	}
 }
+
+func IsUserValidByToken(token string, usersCollection *mongo.Collection) bool {
+	secretKey := iwantatoken.GetTokenSecretKey()
+	decryptedToken, err := iwantatoken.Decrypt(token, []byte(secretKey))
+	if err != nil {
+		return false
+	}
+
+	phoneNumber := strings.Split(decryptedToken, "|")[0]
+
+	var user User
+	err = usersCollection.FindOne(context.Background(), bson.M{"phoneNumber": phoneNumber}).Decode(&user)
+
+	if err != nil || user.UserStatus != 0 {
+		return false
+	}
+
+	return true
+}

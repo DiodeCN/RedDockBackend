@@ -5,7 +5,6 @@ import (
 	"log"
 	"math/rand"
 	"os"
-	"path/filepath"
 	"time"
 
 	"github.com/DiodeCN/RedDockBackend/Components/inviter"
@@ -13,8 +12,9 @@ import (
 	"github.com/DiodeCN/RedDockBackend/Components/register"
 	"github.com/DiodeCN/RedDockBackend/Components/tweet"
 
-	// iwantatoken "github.com/DiodeCN/RedDockBackend/SimpleModule/iwantatoken"
 	"github.com/DiodeCN/RedDockBackend/SimpleModule/isTokenOK"
+	"github.com/DiodeCN/RedDockBackend/SimpleModule/whereismyavatar"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -80,12 +80,7 @@ func main() {
 	r.POST("/api/register", register.RegisterHandler(usersCollection, inviterCollection))
 	r.POST("/api/token", isTokenOK.TokenHandler(usersCollection))
 
-	r.GET("/api/avatar/:filename", func(c *gin.Context) {
-		filename := c.Param("filename")
-		filePath := filepath.Join(cwd, "PictureStorage", "Avatar", filename+".png")
-
-		c.FileAttachment(filePath, filename+".png")
-	})
+	r.GET("/api/avatar/:filename", whereismyavatar.AvatarHandler(usersCollection, cwd))
 
 	if err := r.Run(":10628"); err != nil {
 		log.Fatal(err)
