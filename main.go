@@ -13,6 +13,7 @@ import (
 	"github.com/DiodeCN/RedDockBackend/Components/tweet"
 
 	"github.com/DiodeCN/RedDockBackend/SimpleModule/isTokenOK"
+	"github.com/DiodeCN/RedDockBackend/SimpleModule/requestlogger"
 	"github.com/DiodeCN/RedDockBackend/SimpleModule/whereismyavatar"
 
 	"github.com/gin-contrib/cors"
@@ -33,6 +34,9 @@ func main() {
 	r := gin.Default()
 	// 添加CORS中间件，允许来自所有域的请求
 	r.Use(cors.Default())
+	// 添加请求日志中间件
+	r.Use(requestlogger.RequestLogger())
+
 	ctx := context.Background()
 
 	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017"))
