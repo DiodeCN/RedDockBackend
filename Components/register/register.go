@@ -81,8 +81,13 @@ func VerifyAndRegisterUser(ctx context.Context, usersCollection *mongo.Collectio
 		}
 
 		globalDataManipulation.IncrementUsers()
+		uid, err := globalDataManipulation.GetAndIncrementUsers()
+		if err != nil {
+			log.Fatal(err)
+		}
+		// 使用更新后的“Total number of users”字段值
 
-		update := bson.M{"$set": bson.M{"nickname": nickname, "inviter": inviter, "password": password}}
+		update := bson.M{"$set": bson.M{"nickname": nickname, "inviter": inviter, "password": password, "uid": uid}}
 		_, err = usersCollection.UpdateOne(ctx, filter, update)
 		if err != nil {
 			return false, err

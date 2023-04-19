@@ -28,3 +28,27 @@ func IncrementUsers() error {
 	}
 	return nil
 }
+
+func GetAndIncrementUsers() (string, error) {
+	// 连接到MongoDB
+	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
+	client, err := mongo.Connect(context.Background(), clientOptions)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer client.Disconnect(context.Background())
+
+	// 获取并更新RedDock.Global文档中的“Total number of users”字段
+	collection := client.Database("RedDock").Collection("Global")
+	filter := bson.M{"_id": "RedDock.Global"}
+	update := bson.M{"$inc": bson.M{"Total number of users": 1000000}}
+	options := options.FindOneAndUpdate().SetReturnDocument(options.After)
+	var result bson.M
+	err = collection.FindOneAndUpdate(context.Background(), filter, update, options).Decode(&result)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// 返回更新后的“Total number of users”字段值
+	return result["Total number of users"].(string), nil
+}
