@@ -29,7 +29,7 @@ func IncrementUsers() error {
 	return nil
 }
 
-func GetAndIncrementUsers() (string, error) {
+func GetAndIncrementUsers() (int32, error) {
 	// 连接到MongoDB
 	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
 	client, err := mongo.Connect(context.Background(), clientOptions)
@@ -42,7 +42,7 @@ func GetAndIncrementUsers() (string, error) {
 	collection := client.Database("RedDock").Collection("Global")
 	filter := bson.M{"_id": "RedDock.Global"}
 	update := bson.M{"$inc": bson.M{"Total number of users": 1000000}}
-	options := options.FindOneAndUpdate().SetReturnDocument(options.After)
+	options := options.FindOneAndUpdate().SetReturnDocument(options.After).SetUpsert(true)
 	var result bson.M
 	err = collection.FindOneAndUpdate(context.Background(), filter, update, options).Decode(&result)
 	if err != nil {
@@ -50,5 +50,5 @@ func GetAndIncrementUsers() (string, error) {
 	}
 
 	// 返回更新后的“Total number of users”字段值
-	return result["Total number of users"].(string), nil
+	return result["Total number of users"].(int32), nil
 }
