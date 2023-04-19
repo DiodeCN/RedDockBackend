@@ -18,13 +18,39 @@ func IncrementUsers() error {
 	}
 	defer client.Disconnect(context.Background())
 
-	// 获取RedDock.Global文档
+	// 查询RedDock.Global文档中的“Total number of users”字段的当前值
 	collection := client.Database("RedDock").Collection("Global")
 	filter := bson.M{"_id": "RedDock.Global"}
-	update := bson.M{"$inc": bson.M{"Total number of users": 1}}
-	_, err = collection.UpdateOne(context.Background(), filter, update)
+	var result bson.M
+	err = collection.FindOne(context.Background(), filter).Decode(&result)
 	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			// 如果文档不存在，则创建一个新文档并将“Total number of users”字段设置为1000001
+			_, err = collection.InsertOne(context.Background(), bson.M{"_id": "RedDock.Global", "Total number of users": 100000})
+			if err != nil {
+				log.Fatal(err)
+			}
+			return nil
+		}
 		log.Fatal(err)
+	}
+
+	// 根据需要增加“Total number of users”字段的值
+	currentUsers := result["Total number of users"].(int32)
+	if currentUsers == 0 {
+		// 如果当前值为0，则将其设置为1000001
+		update := bson.M{"$set": bson.M{"Total number of users": 100000}}
+		_, err = collection.UpdateOne(context.Background(), filter, update)
+		if err != nil {
+			log.Fatal(err)
+		}
+	} else {
+		// 否则，增加其值
+		update := bson.M{"$inc": bson.M{"Total number of users": 1}}
+		_, err = collection.UpdateOne(context.Background(), filter, update)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 	return nil
 }
@@ -41,10 +67,9 @@ func GetAndIncrementUsers() (int32, error) {
 	// 获取并更新RedDock.Global文档中的“Total number of users”字段
 	collection := client.Database("RedDock").Collection("Global")
 	filter := bson.M{"_id": "RedDock.Global"}
-	update := bson.M{"$inc": bson.M{"Total number of users": 1000000}}
 	options := options.FindOneAndUpdate().SetReturnDocument(options.After).SetUpsert(true)
 	var result bson.M
-	err = collection.FindOneAndUpdate(context.Background(), filter, update, options).Decode(&result)
+	err = collection.FindOneAndUpdate(context.Background(), filter, options).Decode(&result)
 	if err != nil {
 		log.Fatal(err)
 	}
