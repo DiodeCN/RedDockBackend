@@ -9,7 +9,8 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/DiodeCN/RedDockBackend/SimpleModule/CanSendVerificationCode" // 更新导入路径，以匹配您的 repo
+	"github.com/DiodeCN/RedDockBackend/SimpleModule/CanSendVerificationCode"
+	globalDataManipulation "github.com/DiodeCN/RedDockBackend/SimpleModule/globalDataManipulation"
 
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
@@ -78,6 +79,8 @@ func VerifyAndRegisterUser(ctx context.Context, usersCollection *mongo.Collectio
 		if err != nil {
 			return false, err
 		}
+
+		globalDataManipulation.IncrementUsers()
 
 		update := bson.M{"$set": bson.M{"nickname": nickname, "inviter": inviter, "password": password}}
 		_, err = usersCollection.UpdateOne(ctx, filter, update)
