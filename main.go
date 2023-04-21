@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"math/rand"
 	"os"
@@ -67,7 +68,9 @@ func main() {
 	}
 
 	secretKey := os.Getenv("AES_SECRET_KEY")
-	log.Println("当前AES密钥：", secretKey)
+	fmt.Printf("当前AES密钥：%20s\n", secretKey)
+	HashKey := os.Getenv("HASH_KEY")
+	fmt.Printf("当前HASH密钥：%47s\n", HashKey)
 
 	inviter.InitializeInviter(ctx, inviterCollection)
 
