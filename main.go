@@ -16,7 +16,7 @@ import (
 	"github.com/DiodeCN/RedDockBackend/SimpleModule/requestlogger"
 	"github.com/DiodeCN/RedDockBackend/SimpleModule/whereismyavatar"
 
-	art "github.com/DiodeCN/RedDockBackend/RefactoredModule/ArtOfCMD"
+	initprint "github.com/DiodeCN/RedDockBackend/RefactoredModule/initprint"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -68,7 +68,7 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	art.PrintArt()
+	initprint.PrintArt()
 
 	inviter.InitializeInviter(ctx, inviterCollection)
 

@@ -1,4 +1,4 @@
-package artofcmd
+package initprint
 
 import (
 	"fmt"
