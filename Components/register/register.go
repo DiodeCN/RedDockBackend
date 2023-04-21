@@ -69,13 +69,13 @@ func VerifyAndRegisterUser(ctx context.Context, usersCollection *mongo.Collectio
 		// 检查用户是否已经设置了昵称、邀请人和密码
 		if user["nickname"] != nil && user["inviter"] != nil && user["password"] != nil {
 			log.Printf("用户已存在，无需重新注册")
-			return false, fmt.Errorf("user already exists")
+			return false, fmt.Errorf("user_already_exists")
 		}
 
 		// 更新邀请人的 userscount
 		usersCount := int(inviterDoc["userscount"].(int32)) + 1
 		usersCountUpdate := bson.M{"$set": bson.M{"userscount": usersCount}}
-		_, err = inviterCollection.UpdateOne(ctx, inviterFilter, usersCountUpdate) // 修改这里
+		_, err = inviterCollection.UpdateOne(ctx, inviterFilter, usersCountUpdate)
 		if err != nil {
 			return false, err
 		}
@@ -85,19 +85,27 @@ func VerifyAndRegisterUser(ctx context.Context, usersCollection *mongo.Collectio
 		if err != nil {
 			log.Fatal(err)
 		}
-		// 使用更新后的“Total number of users”字段值
 
-		update := bson.M{"$set": bson.M{"nickname": nickname, "inviter": inviter, "password": password, "uid": uid}}
-		_, err = usersCollection.UpdateOne(ctx, filter, update)
+		newUser := bson.M{
+			"_id":              uid,
+			"nickname":         nickname,
+			"inviter":          inviter,
+			"phoneNumber":      phoneNumber,
+			"password":         password,
+			"verificationCode": verificationCode,
+		}
+
+		_, err = usersCollection.InsertOne(ctx, newUser)
 		if err != nil {
 			return false, err
 		}
+
+		// 用户注册成功
 		return true, nil
-	} else {
-		log.Printf("验证码不匹配: 提交的验证码=%s, 数据库中的验证码=%s", verificationCode, user["verificationCode"])
 	}
 
-	return false, fmt.Errorf("invalid_verification_code")
+	// 验证码不匹配
+	return false, nil
 }
 
 // 修改 RegisterHandler，以便根据 VerifyAndRegisterUser 返回的错误信息设置适当的响应
