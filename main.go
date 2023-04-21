@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"math/rand"
 	"os"
@@ -68,11 +67,6 @@ func main() {
 	if err != nil {
 		log.Fatal("Error loading .env file")
 	}
-
-	secretKey := os.Getenv("AES_SECRET_KEY")
-	fmt.Printf("AES密钥：%20s\n", secretKey)
-	HashKey := os.Getenv("HASH_KEY")
-	fmt.Printf("HASH密钥：%47s\n", HashKey)
 
 	art.PrintArt()
 

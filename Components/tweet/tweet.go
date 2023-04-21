@@ -26,6 +26,8 @@ type Tweet struct {
 	Shares    int       `json:"shares" bson:"shares"`
 	Views     int       `json:"views" bson:"views"`
 	Comments  int       `json:"comments" bson:"comments"`
+	Sign      string    `json:"sign" bson:"sign"`
+	Tittle    string    `json:"tittle" bson:"tittle"`
 }
 
 func NewTweet(id, name, avatarURL, content string) *Tweet {

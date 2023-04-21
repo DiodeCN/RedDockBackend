@@ -1,8 +1,16 @@
 package artofcmd
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+)
 
 func PrintArt() {
+	secretKey := os.Getenv("AES_SECRET_KEY")
+	fmt.Printf("AES密钥：%20s\n", secretKey)
+	HashKey := os.Getenv("HASH_KEY")
+	fmt.Printf("HASH密钥：%47s\n", HashKey)
+
 	art := []string{
 		"          ,----.                       ___      _,.----.       _,.---._        ,-,--.        ,----.                  ",
 		"       ,-.--` , \\    _.-.       .-._ .'=.'\\   .' .' -   \\    ,-.' , -  `.    ,-.'-  _\\    ,-.--` , \\                 ",
