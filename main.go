@@ -17,6 +17,8 @@ import (
 	"github.com/DiodeCN/RedDockBackend/SimpleModule/requestlogger"
 	"github.com/DiodeCN/RedDockBackend/SimpleModule/whereismyavatar"
 
+	art "github.com/DiodeCN/RedDockBackend/RefactoredModule/ArtOfCMD"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -68,9 +70,11 @@ func main() {
 	}
 
 	secretKey := os.Getenv("AES_SECRET_KEY")
-	fmt.Printf("当前AES密钥：%20s\n", secretKey)
+	fmt.Printf("AES密钥：%20s\n", secretKey)
 	HashKey := os.Getenv("HASH_KEY")
-	fmt.Printf("当前HASH密钥：%47s\n", HashKey)
+	fmt.Printf("HASH密钥：%47s\n", HashKey)
+
+	art.PrintArt()
 
 	inviter.InitializeInviter(ctx, inviterCollection)
 
