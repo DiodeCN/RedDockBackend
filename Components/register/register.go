@@ -12,7 +12,7 @@ import (
 	hash "github.com/DiodeCN/RedDockBackend/RefactoredModule/hash"
 	"github.com/DiodeCN/RedDockBackend/SimpleModule/CanSendVerificationCode"
 	globalDataManipulation "github.com/DiodeCN/RedDockBackend/SimpleModule/globalDataManipulation"
-	iwantatoken "github.com/DiodeCN/RedDockBackend/SimpleModule/iWantAToken"
+	iwantatoken "github.com/DiodeCN/RedDockBackend/SimpleModule/iwantatoken"
 
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
