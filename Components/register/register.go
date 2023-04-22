@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 
+	hash "github.com/DiodeCN/RedDockBackend/RefactoredModule/hash"
 	"github.com/DiodeCN/RedDockBackend/SimpleModule/CanSendVerificationCode"
 	globalDataManipulation "github.com/DiodeCN/RedDockBackend/SimpleModule/globalDataManipulation"
 
@@ -36,10 +37,16 @@ func GenerateVerificationCode() string {
 }
 
 func VerifyAndRegisterUser(ctx context.Context, usersCollection *mongo.Collection, inviterCollection *mongo.Collection, phoneNumber, verificationCode, nickname, inviter, password string) (bool, error) {
+	//搞点哈希
+	hashedPassword, err := hash.HashString(password)
+	if err != nil {
+		return false, fmt.Errorf("hashing_error")
+	}
+
 	// 检查邀请人是否存在
 	inviterFilter := bson.M{"inviter": inviter}
 	inviterDoc := bson.M{}
-	err := inviterCollection.FindOne(ctx, inviterFilter).Decode(&inviterDoc)
+	err = inviterCollection.FindOne(ctx, inviterFilter).Decode(&inviterDoc)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			// 邀请人不存在
@@ -91,7 +98,7 @@ func VerifyAndRegisterUser(ctx context.Context, usersCollection *mongo.Collectio
 			"nickname":         nickname,
 			"inviter":          inviter,
 			"phoneNumber":      phoneNumber,
-			"password":         password,
+			"password":         hashedPassword, // 将原始密码替换为哈希后的密码
 			"verificationCode": verificationCode,
 		}
 
@@ -103,9 +110,8 @@ func VerifyAndRegisterUser(ctx context.Context, usersCollection *mongo.Collectio
 		// 用户注册成功
 		return true, nil
 	}
+	return false, fmt.Errorf("invalid_verification_code")
 
-	// 验证码不匹配
-	return false, nil
 }
 
 // 修改 RegisterHandler，以便根据 VerifyAndRegisterUser 返回的错误信息设置适当的响应
