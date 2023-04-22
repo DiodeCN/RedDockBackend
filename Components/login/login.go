@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strings"
 
+	hash "github.com/DiodeCN/RedDockBackend/RefactoredModule/hash"
 	crypt "github.com/DiodeCN/RedDockBackend/SimpleModule/cryptIt"
 	"github.com/DiodeCN/RedDockBackend/SimpleModule/iwantatoken"
 	"go.mongodb.org/mongo-driver/bson"
@@ -78,7 +79,8 @@ func HandleLogin(usersCollection *mongo.Collection) func(c *gin.Context) {
 		}
 
 		// 验证密码以及解密后的信息
-		if user["password"] == loginData.Password && decryptedParts[0] == loginData.Timestamp && decryptedParts[1] == loginData.Email && decryptedParts[2] == loginData.Password {
+		if hash.CheckHash(user["password"].(string), loginData.Password) && decryptedParts[0] == loginData.Timestamp && decryptedParts[1] == loginData.Email && decryptedParts[2] == loginData.Password {
+
 			// 创建Token字符串
 			tokenString := loginData.Email + "|" + loginData.Timestamp
 
@@ -90,15 +92,15 @@ func HandleLogin(usersCollection *mongo.Collection) func(c *gin.Context) {
 				c.JSON(http.StatusInternalServerError, gin.H{"error": "Token encryption failed"})
 				return
 			}
-/*
-			decryptedToken, err := iwantatoken.Decrypt("3r8AZJTLXjVulZv4L03PYaIgChr/blFzhrspkIEveH0ZS38V1jLsxo8mmwAggxJTlXNHSTalWQ==", secretKey)
-			if err != nil {
-				log.Println("Error during token encryption: ", err)
-				c.JSON(http.StatusInternalServerError, gin.H{"error": "Token encryption failed"})
-				return
-			}
-			log.Println(decryptedToken)
-*/
+			/*
+				decryptedToken, err := iwantatoken.Decrypt("3r8AZJTLXjVulZv4L03PYaIgChr/blFzhrspkIEveH0ZS38V1jLsxo8mmwAggxJTlXNHSTalWQ==", secretKey)
+				if err != nil {
+					log.Println("Error during token encryption: ", err)
+					c.JSON(http.StatusInternalServerError, gin.H{"error": "Token encryption failed"})
+					return
+				}
+				log.Println(decryptedToken)
+			*/
 			// 返回登录成功信息和加密Token
 			c.JSON(http.StatusOK, gin.H{"message": "登录成功", "token": encryptedToken})
 		} else {
