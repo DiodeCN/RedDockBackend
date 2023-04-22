@@ -10,7 +10,8 @@ import (
 )
 
 type Tweet struct {
-	ID        string    `json:"id" bson:"id"`
+	UID       string    `json:"uid" bson:"uid"`
+	User      string    `json:"user" bson:"user"`
 	Name      string    `json:"name" bson:"name"`
 	AvatarURL string    `json:"avatar_url" bson:"avatar_url"`
 	Time      time.Time `json:"time" bson:"time"`
@@ -32,7 +33,7 @@ type Tweet struct {
 
 func NewTweet(id, name, avatarURL, content string) *Tweet {
 	return &Tweet{
-		ID:        id,
+		UID:       id,
 		Name:      name,
 		AvatarURL: avatarURL,
 		Content:   content,
@@ -65,16 +66,14 @@ func GetAllTweets(ctx context.Context, tweetsCollection *mongo.Collection) ([]Tw
 	if count == 0 {
 		defaultTweets := []Tweet{
 			{
-				ID:        "default1",
-				Name:      "Default User 1",
-				AvatarURL: "https://example.com/avatar1.png",
-				Content:   "This is a default tweet from Default User 1.",
+				UID:     "1",
+				User:    "100004",
+				Content: "This is a default tweet from Default User 1.",
 			},
 			{
-				ID:        "default2",
-				Name:      "Default User 2",
-				AvatarURL: "https://example.com/avatar2.png",
-				Content:   "This is another default tweet from Default User 2.",
+				UID:     "2",
+				User:    "100004",
+				Content: "This is another default tweet from Default User 2.",
 			},
 		}
 
