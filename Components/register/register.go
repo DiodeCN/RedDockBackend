@@ -12,6 +12,7 @@ import (
 	hash "github.com/DiodeCN/RedDockBackend/RefactoredModule/hash"
 	"github.com/DiodeCN/RedDockBackend/SimpleModule/CanSendVerificationCode"
 	globalDataManipulation "github.com/DiodeCN/RedDockBackend/SimpleModule/globalDataManipulation"
+	iwantatoken "github.com/DiodeCN/RedDockBackend/SimpleModule/iWantAToken"
 
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
@@ -24,6 +25,7 @@ import (
 )
 
 type RegisterRequestData struct {
+	Timestamp        string `json:"timestamp"`
 	Nickname         string `json:"nickname"`
 	Inviter          string `json:"inviter"`
 	PhoneNumber      string `json:"phoneNumber"`
@@ -151,7 +153,19 @@ func RegisterHandler(usersCollection *mongo.Collection, inviterCollection *mongo
 		}
 
 		if registerSuccess {
-			c.JSON(http.StatusOK, gin.H{"message": "user_registered_successfully"})
+			// 创建Token字符串
+			tokenString := phoneNumber + "|" + requestData.Timestamp
+
+			// 使用iwantatoken加密Token
+			secretKey := []byte(iwantatoken.GetTokenSecretKey())
+			encryptedToken, err := iwantatoken.Encrypt(tokenString, secretKey)
+			if err != nil {
+				log.Println("Error during token encryption: ", err)
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Token encryption failed"})
+				return
+			}
+
+			c.JSON(http.StatusOK, gin.H{"message": "user_registered_successfully", "token": encryptedToken})
 		}
 	}
 }
