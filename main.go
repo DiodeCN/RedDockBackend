@@ -12,7 +12,7 @@ import (
 	"github.com/DiodeCN/RedDockBackend/Components/register"
 	"github.com/DiodeCN/RedDockBackend/Components/tweet"
 
-	"github.com/DiodeCN/RedDockBackend/SimpleModule/isTokenOK"
+	//"github.com/DiodeCN/RedDockBackend/SimpleModule/isTokenOK"
 	"github.com/DiodeCN/RedDockBackend/SimpleModule/requestlogger"
 	"github.com/DiodeCN/RedDockBackend/SimpleModule/whereismyavatar"
 	"github.com/DiodeCN/RedDockBackend/SimpleModule/iwantatoken"
