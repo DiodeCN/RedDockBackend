@@ -89,7 +89,10 @@ func VerifyAndRegisterUser(ctx context.Context, usersCollection *mongo.Collectio
 			return false, err
 		}
 
-		uid := int(user["_id"].(int32))
+		uid, err := globalDataManipulation.GetAndIncrementUsers()
+		if err != nil {
+			log.Fatal(err)
+		}
 
 		newUser := bson.M{
 			"_id":              uid,
