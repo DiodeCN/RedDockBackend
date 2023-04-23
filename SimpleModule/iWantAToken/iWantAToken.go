@@ -139,12 +139,11 @@ func TokenHandler(usersCollection *mongo.Collection) func(c *gin.Context) {
 
 		// 使用 iwantatoken 包的 Decrypt 函数解密 token
 		secretKey := GetTokenSecretKey()
-
-		/*
+		
 		decryptedToken, err := Decrypt(token, []byte(secretKey))
-		log.Println(decryptedToken)
-		*/
-
+		
+		//log.Println(decryptedToken)
+		
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid token"})
 			return
