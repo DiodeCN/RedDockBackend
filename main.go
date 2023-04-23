@@ -85,7 +85,7 @@ func main() {
 	r.POST("/api/login", login.HandleLogin(usersCollection))
 	r.POST("/api/send_VC", register.SendVerificationCodeHandler(usersCollection))
 	r.POST("/api/register", register.RegisterHandler(usersCollection, inviterCollection))
-	r.POST("/api/token", isTokenOK.TokenHandler(usersCollection))
+	//r.POST("/api/token", isTokenOK.TokenHandler(usersCollection))这个弃用
 	r.POST("/api/tokencheck", iwantatoken.TokenHandler(usersCollection))
 
 

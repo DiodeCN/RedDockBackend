@@ -139,11 +139,9 @@ func TokenHandler(usersCollection *mongo.Collection) func(c *gin.Context) {
 
 		// 使用 iwantatoken 包的 Decrypt 函数解密 token
 		secretKey := GetTokenSecretKey()
-		
+
 		decryptedToken, err := Decrypt(token, []byte(secretKey))
-		
-		//log.Println(decryptedToken)
-		
+
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid token"})
 			return
@@ -151,7 +149,37 @@ func TokenHandler(usersCollection *mongo.Collection) func(c *gin.Context) {
 
 		// 检查解密后的 token 是否包含 "|" 字符
 		if strings.Contains(decryptedToken, "|") {
-			c.JSON(http.StatusOK, gin.H{"message": "Token is valid"})
+			parts := strings.Split(decryptedToken, "|")
+			phoneNumber := parts[0]
+
+			// Connect to MongoDB and check if the phoneNumber exists.
+			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+			defer cancel()
+
+			filter := bson.M{"phoneNumber": phoneNumber}
+			var result bson.M
+			err = usersCollection.FindOne(ctx, filter).Decode(&result)
+
+			// If phoneNumber doesn't exist, create a new entry with accountStatus set to "0"
+			if err == mongo.ErrNoDocuments {
+				newEntry := bson.M{"phoneNumber": phoneNumber, "accountStatus": "0"}
+				_, err = usersCollection.InsertOne(ctx, newEntry)
+				if err != nil {
+					c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to insert new entry"})
+					return
+				}
+				c.JSON(http.StatusOK, gin.H{"message": "Token is valid, new entry created"})
+			} else if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Error querying the database"})
+			} else {
+				accountStatus := result["accountStatus"].(string)
+				if accountStatus == "0" || accountStatus == "" {
+					c.JSON(http.StatusOK, gin.H{"message": "Token is valid"})
+				} else {
+					c.JSON(http.StatusBadRequest, gin.H{"error": accountStatus})
+				}
+			}
+
 		} else {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid token"})
 		}
