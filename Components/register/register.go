@@ -91,7 +91,7 @@ func VerifyAndRegisterUser(ctx context.Context, usersCollection *mongo.Collectio
 
 		uid := int(user["_id"].(int32))
 
-		log.Println(uid)
+		log.Println(uid, hashedPassword)
 
 		// 用户注册成功
 		return true, nil
