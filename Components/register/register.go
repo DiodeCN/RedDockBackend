@@ -73,40 +73,8 @@ func VerifyAndRegisterUser(ctx context.Context, usersCollection *mongo.Collectio
 
 	// 用户已存在，检查验证码是否正确
 	if user["verificationCode"] == verificationCode {
-		log.Printf("验证码匹配: 提交的验证码=%s, 数据库中的验证码=%s", verificationCode, user["verificationCode"])
 
-		// 检查用户是否已经设置了昵称、邀请人和密码
-		if user["nickname"] != nil && user["inviter"] != nil && user["password"] != nil {
-			log.Printf("用户已存在，无需重新注册")
-			return false, fmt.Errorf("user_already_exists")
-		}
-
-		// 更新邀请人的 userscount
-		usersCount := int(inviterDoc["userscount"].(int32)) + 1
-		usersCountUpdate := bson.M{"$set": bson.M{"userscount": usersCount}}
-		_, err = inviterCollection.UpdateOne(ctx, inviterFilter, usersCountUpdate)
-		if err != nil {
-			return false, err
-		}
-
-		globalDataManipulation.IncrementUsers()
-		uid := int(user["_id"].(int32))
-
-		newUser := bson.M{
-			"_id":              uid,
-			"nickname":         nickname,
-			"inviter":          inviter,
-			"phoneNumber":      phoneNumber,
-			"password":         hashedPassword, // 将原始密码替换为哈希后的密码
-			"verificationCode": verificationCode,
-		}
-
-		_, err = usersCollection.InsertOne(ctx, newUser)
-		if err != nil {
-			return false, err
-		}
-
-		// 用户注册成功
+		log.Println(hashedPassword)
 		return true, nil
 	}
 	return false, fmt.Errorf("invalid_verification_code")
