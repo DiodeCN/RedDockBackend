@@ -23,7 +23,7 @@ func CanSendVerificationCode(ip string, phoneNumber string) bool {
 	return true
 }
 
-func StoreVerificationCodeInDB(ctx context.Context, usersCollection *mongo.Collection, phoneNumber, verificationCode string) error {
+func StoreVerificationCodeInDB(ctx context.Context, usersCollection *mongo.Collection, phoneNumber, verificationCode string, uid int) error {
 	filter := bson.M{"phoneNumber": phoneNumber}
 
 	// 获取用户文档
@@ -52,6 +52,8 @@ func StoreVerificationCodeInDB(ctx context.Context, usersCollection *mongo.Colle
 			"createdAt":        time.Now(),
 			"sendvcday":        sendvcday,
 			"daycount":         daycount,
+			"_id":              uid,
+			"phoneNumber":      phoneNumber,
 		},
 	}
 	opts := options.Update().SetUpsert(true)

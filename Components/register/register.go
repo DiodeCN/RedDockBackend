@@ -90,10 +90,7 @@ func VerifyAndRegisterUser(ctx context.Context, usersCollection *mongo.Collectio
 		}
 
 		globalDataManipulation.IncrementUsers()
-		uid, err := globalDataManipulation.GetAndIncrementUsers()
-		if err != nil {
-			log.Fatal(err)
-		}
+		uid := int(user["_id"].(int32))
 
 		newUser := bson.M{
 			"_id":              uid,
@@ -204,9 +201,16 @@ func SendVerificationCodeHandler(usersCollection *mongo.Collection) func(c *gin.
 			return
 		}
 
+		uid, err := globalDataManipulation.GetAndIncrementUsers()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		// Generate a verification code
 		verificationCode := GenerateVerificationCode()
 
-		err = CanSendVerificationCode.StoreVerificationCodeInDB(context.Background(), usersCollection, phoneNumber, verificationCode)
+		// Store the verification code and user ID in the database
+		err = CanSendVerificationCode.StoreVerificationCodeInDB(context.Background(), usersCollection, phoneNumber, verificationCode, int(uid))
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to store verification code"})
 			return
