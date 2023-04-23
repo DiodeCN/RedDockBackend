@@ -9,11 +9,13 @@ import (
 	"errors"
 	"io"
 	"log"
+	"net/http"
 	"os"
 	"strings"
-	"time"
-
+	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+    "time"
+
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -120,4 +122,27 @@ func CheckForDelimiter(encodedText string) (bool, error) {
 
 	return true, nil
 }
+
+func TokenHandler(usersCollection *mongo.Collection) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		// 获取请求中的 token
+		token := c.PostForm("token")
+
+		// 使用 iwantatoken 包的 Decrypt 函数解密 token
+		secretKey := GetTokenSecretKey()
+		decryptedToken, err := Decrypt(token, []byte(secretKey))
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid token"})
+			return
+		}
+
+		// 检查解密后的 token 是否包含 "|" 字符
+		if strings.Contains(decryptedToken, "|") {
+			c.JSON(http.StatusOK, gin.H{"message": "Token is valid"})
+		} else {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid token"})
+		}
+	}
+}
+
 
