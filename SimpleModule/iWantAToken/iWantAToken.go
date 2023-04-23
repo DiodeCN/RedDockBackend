@@ -172,7 +172,11 @@ func TokenHandler(usersCollection *mongo.Collection) func(c *gin.Context) {
 			} else if err != nil {
 				c.JSON(http.StatusInternalServerError, gin.H{"error": "Error querying the database"})
 			} else {
-				accountStatus := result["accountStatus"].(string)
+				accountStatusRaw := result["accountStatus"]
+				accountStatus := ""
+				if accountStatusRaw != nil {
+					accountStatus = accountStatusRaw.(string)
+				}
 				if accountStatus == "0" || accountStatus == "" {
 					c.JSON(http.StatusOK, gin.H{"message": "Token is valid"})
 				} else {
