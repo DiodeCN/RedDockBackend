@@ -53,7 +53,7 @@ func Decrypt(encryptedData string) (string, error) {
 		return "", err
 	}
 
-	log.Println("解密数据: ", string(unpaddedData))
+	//log.Println("解密数据: ", string(unpaddedData))
 
 	return string(unpaddedData), nil
 }

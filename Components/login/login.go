@@ -32,7 +32,7 @@ func HandleLogin(usersCollection *mongo.Collection) func(c *gin.Context) {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request data"})
 			return
 		}
-		log.Println(loginData)
+		//log.Println(loginData)
 
 		/*
 			encrypted, err := crypt.Encrypt("nihao")
