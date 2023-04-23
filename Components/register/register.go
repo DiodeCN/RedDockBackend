@@ -89,24 +89,9 @@ func VerifyAndRegisterUser(ctx context.Context, usersCollection *mongo.Collectio
 			return false, err
 		}
 
-		uid, err := globalDataManipulation.GetAndIncrementUsers()
-		if err != nil {
-			log.Fatal(err)
-		}
+		uid := int(user["_id"].(int32))
 
-		newUser := bson.M{
-			"_id":              uid,
-			"nickname":         nickname,
-			"inviter":          inviter,
-			"phoneNumber":      phoneNumber,
-			"password":         hashedPassword, // 将原始密码替换为哈希后的密码
-			"verificationCode": verificationCode,
-		}
-
-		_, err = usersCollection.InsertOne(ctx, newUser)
-		if err != nil {
-			return false, err
-		}
+		log.Println(uid)
 
 		// 用户注册成功
 		return true, nil
