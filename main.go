@@ -15,6 +15,8 @@ import (
 	"github.com/DiodeCN/RedDockBackend/SimpleModule/isTokenOK"
 	"github.com/DiodeCN/RedDockBackend/SimpleModule/requestlogger"
 	"github.com/DiodeCN/RedDockBackend/SimpleModule/whereismyavatar"
+	"github.com/DiodeCN/RedDockBackend/SimpleModule/iwantatoken"
+
 
 	initprint "github.com/DiodeCN/RedDockBackend/RefactoredModule/initprint"
 
@@ -84,6 +86,8 @@ func main() {
 	r.POST("/api/send_VC", register.SendVerificationCodeHandler(usersCollection))
 	r.POST("/api/register", register.RegisterHandler(usersCollection, inviterCollection))
 	r.POST("/api/token", isTokenOK.TokenHandler(usersCollection))
+	r.POST("/api/tokencheck", iwantatoken.TokenHandler(usersCollection))
+
 
 	r.GET("/api/avatar/:filename", whereismyavatar.AvatarHandler(usersCollection, cwd))
 
