@@ -91,7 +91,21 @@ func VerifyAndRegisterUser(ctx context.Context, usersCollection *mongo.Collectio
 
 		uid := int(user["_id"].(int32))
 
-		log.Println(uid, hashedPassword)
+		newUser := bson.M{
+			"$set": bson.M{
+				"_id":              uid,
+				"nickname":         nickname,
+				"inviter":          inviter,
+				"phoneNumber":      phoneNumber,
+				"password":         hashedPassword, // 将原始密码替换为哈希后的密码
+				"verificationCode": verificationCode,
+			},
+		}
+
+		_, err = usersCollection.UpdateOne(ctx, filter, newUser)
+		if err != nil {
+			return false, err
+		}
 
 		// 用户注册成功
 		return true, nil
