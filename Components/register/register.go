@@ -58,17 +58,17 @@ func VerifyAndRegisterUser(ctx context.Context, usersCollection *mongo.Collectio
 		return false, fmt.Errorf("database_error")
 	}
 
-	// 邀请人存在，检查验证码
 	filter := bson.M{"phoneNumber": phoneNumber}
 	user := bson.M{}
 	err = usersCollection.FindOne(ctx, filter).Decode(&user)
-	if err != nil {
-		if err == mongo.ErrNoDocuments {
-			// 用户不存在，但验证码不匹配，则拒绝注册
-			return false, nil
-		}
+	if err != nil && err != mongo.ErrNoDocuments {
 		// 其他类型的错误
 		return false, err
+	}
+
+	// 用户不存在或验证码不匹配，则拒绝注册
+	if err == mongo.ErrNoDocuments || user["verificationCode"] != verificationCode {
+		return false, fmt.Errorf("invalid_verification_code")
 	}
 
 	// 用户已存在，检查验证码是否正确
