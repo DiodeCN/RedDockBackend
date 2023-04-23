@@ -125,21 +125,30 @@ func CheckForDelimiter(encodedText string) (bool, error) {
 
 func TokenHandler(usersCollection *mongo.Collection) func(c *gin.Context) {
 	return func(c *gin.Context) {
+		// 解析请求中的 JSON 数据
+		var jsonInput struct {
+			Token string `json:"token"`
+		}
+		if err := c.BindJSON(&jsonInput); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid JSON data"})
+			return
+		}
+
 		// 获取请求中的 token
-		token := c.PostForm("token")
+		token := jsonInput.Token
 
 		// 使用 iwantatoken 包的 Decrypt 函数解密 token
 		secretKey := GetTokenSecretKey()
 
-
+		/*
 		decryptedToken, err := Decrypt(token, []byte(secretKey))
 		log.Println(decryptedToken)
+		*/
+
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid token"})
 			return
 		}
-
-
 
 		// 检查解密后的 token 是否包含 "|" 字符
 		if strings.Contains(decryptedToken, "|") {
