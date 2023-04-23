@@ -89,7 +89,6 @@ func VerifyAndRegisterUser(ctx context.Context, usersCollection *mongo.Collectio
 			return false, err
 		}
 
-		globalDataManipulation.IncrementUsers()
 		uid := int(user["_id"].(int32))
 
 		newUser := bson.M{
@@ -110,7 +109,6 @@ func VerifyAndRegisterUser(ctx context.Context, usersCollection *mongo.Collectio
 		return true, nil
 	}
 	return false, fmt.Errorf("invalid_verification_code")
-
 }
 
 // 修改 RegisterHandler，以便根据 VerifyAndRegisterUser 返回的错误信息设置适当的响应
