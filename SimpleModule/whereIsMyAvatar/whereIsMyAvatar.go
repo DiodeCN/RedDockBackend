@@ -1,6 +1,8 @@
 package whereismyavatar
 
 import (
+	"net/http"
+	"os"
 	"path/filepath"
 
 	"github.com/gin-gonic/gin"
@@ -12,7 +14,12 @@ func AvatarHandler(usersCollection *mongo.Collection, cwd string) gin.HandlerFun
 		avatarID := c.Param("filename")
 
 		filePath := filepath.Join(cwd, "PictureStorage", "Avatar", avatarID+".png")
-		c.FileAttachment(filePath, avatarID+".png")
 
+		if _, err := os.Stat(filePath); os.IsNotExist(err) {
+			c.JSON(http.StatusNotFound, gin.H{"error": "Avatar not found"})
+			return
+		}
+
+		c.FileAttachment(filePath, avatarID+".png")
 	}
 }
