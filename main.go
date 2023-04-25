@@ -35,11 +35,15 @@ func main() {
 
 	rand.Seed(time.Now().UnixNano())
 	gin.SetMode(gin.ReleaseMode)
+
 	r := gin.Default()
-	// 添加CORS中间件，允许来自所有域的请求
 	r.Use(cors.Default())
-	// 添加请求日志中间件
 	r.Use(requestlogger.RequestLogger())
+
+	rt := gin.Default()
+	rt.Use(cors.Default())
+	rt.Use(requestlogger.RequestLogger())
+
 
 	ctx := context.Background()
 
@@ -82,6 +86,8 @@ func main() {
 		c.JSON(200, tweets)
 	})
 
+
+
 	r.POST("/api/login", login.HandleLogin(usersCollection))
 	r.POST("/api/send_VC", register.SendVerificationCodeHandler(usersCollection))
 	r.POST("/api/register", register.RegisterHandler(usersCollection, inviterCollection))
@@ -89,7 +95,7 @@ func main() {
 	r.POST("/api/tokencheck", iwantatoken.TokenHandler(usersCollection))
 
 
-	r.GET("/api/avatar/:filename", whereismyavatar.AvatarHandler(usersCollection, cwd))
+	rt.GET("/api/avatar/:filename", whereismyavatar.AvatarHandler(usersCollection, cwd))
 
 	if err := r.Run(":10628"); err != nil {
 		log.Fatal(err)
