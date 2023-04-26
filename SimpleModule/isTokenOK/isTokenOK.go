@@ -9,11 +9,13 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"strconv"
 )
 
 type User struct {
 	PhoneNumber string `bson:"phoneNumber"`
 	UserStatus  int    `bson:"userStatus"`
+	UID         int32  `bson:"_id"` // 添加 UID 字段
 }
 
 func TokenHandler(usersCollection *mongo.Collection) gin.HandlerFunc {
@@ -37,7 +39,7 @@ func TokenHandler(usersCollection *mongo.Collection) gin.HandlerFunc {
 
 		switch user.UserStatus {
 		case 0:
-			c.Status(200)
+			c.JSON(200, gin.H{"uid": strconv.Itoa(int(user.UID))}) // 修改此行，返回 uid
 		case 1:
 			c.JSON(403, gin.H{"error": "Account banned"})
 		default:
@@ -45,6 +47,7 @@ func TokenHandler(usersCollection *mongo.Collection) gin.HandlerFunc {
 		}
 	}
 }
+
 
 func IsUserValidByToken(token string, usersCollection *mongo.Collection) bool {
 	secretKey := iwantatoken.GetTokenSecretKey()
