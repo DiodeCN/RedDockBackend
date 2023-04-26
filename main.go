@@ -95,7 +95,7 @@ func main() {
 	r.POST("/api/tokencheck", iwantatoken.TokenHandler(usersCollection))
 
 
-	rt.GET("/api/avatar/:filename", whereismyavatar.AvatarHandler(usersCollection, cwd))
+	rt.GET("/api/:filename", whereismyavatar.AvatarHandler(usersCollection, cwd))
 
 	if err := r.Run(":10628"); err != nil {
 		log.Fatal(err)
