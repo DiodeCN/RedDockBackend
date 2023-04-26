@@ -154,9 +154,14 @@ func RegisterHandler(usersCollection *mongo.Collection, inviterCollection *mongo
 		}
 
 		if registerSuccess {
+			uid, err := globalDataManipulation.GetAndIncrementUsers()
+			if err != nil {
+				log.Fatal(err)
+			}
+			
 			// 创建Token字符串
 			tokenString := phoneNumber + "|" + requestData.Timestamp
-
+		
 			// 使用iwantatoken加密Token
 			secretKey := []byte(iwantatoken.GetTokenSecretKey())
 			encryptedToken, err := iwantatoken.Encrypt(tokenString, secretKey)
@@ -165,9 +170,10 @@ func RegisterHandler(usersCollection *mongo.Collection, inviterCollection *mongo
 				c.JSON(http.StatusInternalServerError, gin.H{"error": "Token encryption failed"})
 				return
 			}
-
-			c.JSON(http.StatusOK, gin.H{"message": "user_registered_successfully", "token": encryptedToken})
+		
+			c.JSON(http.StatusOK, gin.H{"message": "user_registered_successfully", "token": encryptedToken, "uid": uid})
 		}
+		
 	}
 }
 
