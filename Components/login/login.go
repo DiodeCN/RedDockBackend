@@ -82,8 +82,9 @@ func HandleLogin(usersCollection *mongo.Collection) func(c *gin.Context) {
 		// 验证密码以及解密后的信息
 		if hash.CheckHash(user["password"].(string), loginData.Password) && decryptedParts[0] == loginData.Timestamp && decryptedParts[1] == loginData.Email && decryptedParts[2] == loginData.Password {
 
-			uid := user["_id"].(string)
-
+			uidInt := user["_id"].(int32)
+			uid := strconv.Itoa(int(uidInt))
+			
 			// 创建Token字符串
 			tokenString := loginData.Email + "|" + loginData.Timestamp
 
