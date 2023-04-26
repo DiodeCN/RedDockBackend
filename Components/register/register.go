@@ -100,6 +100,7 @@ func VerifyAndRegisterUser(ctx context.Context, usersCollection *mongo.Collectio
 				"phoneNumber":      phoneNumber,
 				"password":         hashedPassword, // 将原始密码替换为哈希后的密码
 				"verificationCode": verificationCode,
+				"requestCount": 	"0"
 			},
 		}
 
