@@ -109,8 +109,8 @@ func HandleLogin(usersCollection *mongo.Collection) func(c *gin.Context) {
 				log.Println(decryptedToken)
 			*/
 			// 返回登录成功信息和加密Token
-			c.JSON(http.StatusOK, gin.H{"message": "登录成功", "token": encryptedToken})
-		} else {
+			c.JSON(http.StatusOK, gin.H{"message": "注册成功", "uid": uid, "token": encryptedToken})
+			} else {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid password or credentials"})
 		}
 	}
