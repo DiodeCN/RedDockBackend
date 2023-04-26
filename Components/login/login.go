@@ -5,13 +5,17 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
+
+
 
 	hash "github.com/DiodeCN/RedDockBackend/RefactoredModule/hash"
 	crypt "github.com/DiodeCN/RedDockBackend/SimpleModule/cryptIt"
 	"github.com/DiodeCN/RedDockBackend/SimpleModule/iwantatoken"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+
 
 
 	"github.com/gin-gonic/gin"
@@ -84,7 +88,7 @@ func HandleLogin(usersCollection *mongo.Collection) func(c *gin.Context) {
 
 			uidInt := user["_id"].(int32)
 			uid := strconv.Itoa(int(uidInt))
-			
+
 			// 创建Token字符串
 			tokenString := loginData.Email + "|" + loginData.Timestamp
 
