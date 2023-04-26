@@ -101,4 +101,11 @@ func main() {
 		log.Fatal(err)
 	}
 
+	go func() {
+		if err := rt.Run(":10629"); err != nil {
+			log.Fatal(err)
+		}
+	}()
+	
+
 }
