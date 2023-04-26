@@ -31,6 +31,7 @@ type RegisterRequestData struct {
 	PhoneNumber      string `json:"phoneNumber"`
 	VerificationCode string `json:"verificationCode"`
 	Password         string `json:"password"`
+	RequestCount     string `json:"requestCount"`
 }
 
 // GenerateVerificationCode generates a random 6-digit verification code
