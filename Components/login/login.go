@@ -12,7 +12,6 @@ import (
 	"github.com/DiodeCN/RedDockBackend/SimpleModule/iwantatoken"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 
 
 	"github.com/gin-gonic/gin"
@@ -83,10 +82,7 @@ func HandleLogin(usersCollection *mongo.Collection) func(c *gin.Context) {
 		// 验证密码以及解密后的信息
 		if hash.CheckHash(user["password"].(string), loginData.Password) && decryptedParts[0] == loginData.Timestamp && decryptedParts[1] == loginData.Email && decryptedParts[2] == loginData.Password {
 
-			// 找uid
-			uid := insertResult.InsertedID.(primitive.ObjectID).Hex()
-
-
+			uid := user["_id"].(string)
 
 			// 创建Token字符串
 			tokenString := loginData.Email + "|" + loginData.Timestamp
