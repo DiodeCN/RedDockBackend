@@ -42,6 +42,9 @@ func main() {
 	rt.Use(cors.Default())
 	rt.Use(requestlogger.RequestLogger())
 
+	rt.Use(iwantatoken.TokenMiddleware()) // 使用TokenMiddleware
+
+
 	ctx := context.Background()
 
 	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017"))
