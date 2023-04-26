@@ -193,13 +193,19 @@ func TokenHandler(usersCollection *mongo.Collection) func(c *gin.Context) {
 func TokenMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := c.GetHeader("Authorization")
+
+		// 从 URL 参数中获取 token，如果没有在 header 中找到 token
+		if token == "" {
+			token, _ = c.GetQuery("token")
+		}
+
 		if token == "" {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Missing token"})
 			c.Abort()
 			return
 		}
 
-		// 调用CheckForDelimiter函数来验证token值
+		// 调用 CheckForDelimiter 函数来验证 token 值
 		valid, err := CheckForDelimiter(token)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Unable to validate token"})
@@ -212,7 +218,7 @@ func TokenMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		// 如果token值有效，则继续处理请求
+		// 如果 token 值有效，则继续处理请求
 		c.Next()
 	}
 }

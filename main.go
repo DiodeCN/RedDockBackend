@@ -42,6 +42,12 @@ func main() {
 	rt.Use(cors.Default())
 	rt.Use(requestlogger.RequestLogger())
 
+	config := cors.DefaultConfig()
+	config.AllowAllOrigins = true
+	config.AllowHeaders = append(config.AllowHeaders, "Authorization")
+	rt.Use(cors.New(config))
+	r.Use(cors.New(config))
+
 	rt.Use(iwantatoken.TokenMiddleware()) // 使用TokenMiddleware
 
 
