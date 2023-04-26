@@ -12,11 +12,9 @@ import (
 	"github.com/DiodeCN/RedDockBackend/Components/register"
 	"github.com/DiodeCN/RedDockBackend/Components/tweet"
 
-	//"github.com/DiodeCN/RedDockBackend/SimpleModule/isTokenOK"
 	"github.com/DiodeCN/RedDockBackend/SimpleModule/requestlogger"
 	"github.com/DiodeCN/RedDockBackend/SimpleModule/whereismyavatar"
 	"github.com/DiodeCN/RedDockBackend/SimpleModule/iwantatoken"
-
 
 	initprint "github.com/DiodeCN/RedDockBackend/RefactoredModule/initprint"
 
@@ -44,7 +42,6 @@ func main() {
 	rt.Use(cors.Default())
 	rt.Use(requestlogger.RequestLogger())
 
-
 	ctx := context.Background()
 
 	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017"))
@@ -63,7 +60,6 @@ func main() {
 		}
 	}()
 
-	// log.Println(iwantatoken.EncryptFile("ddd"))
 	twitterDatabase := client.Database("RedDock")
 	tweetsCollection := twitterDatabase.Collection("Tweets")
 	usersCollection := twitterDatabase.Collection("Users")
@@ -86,26 +82,22 @@ func main() {
 		c.JSON(200, tweets)
 	})
 
-
-
 	r.POST("/api/login", login.HandleLogin(usersCollection))
 	r.POST("/api/send_VC", register.SendVerificationCodeHandler(usersCollection))
 	r.POST("/api/register", register.RegisterHandler(usersCollection, inviterCollection))
-	//r.POST("/api/token", isTokenOK.TokenHandler(usersCollection))这个弃用
 	r.POST("/api/tokencheck", iwantatoken.TokenHandler(usersCollection))
-
 
 	rt.GET("/api/:filename", whereismyavatar.AvatarHandler(usersCollection, cwd))
 
-	if err := r.Run(":10628"); err != nil {
-		log.Fatal(err)
-	}
-
+	// Start rt router on a separate goroutine
 	go func() {
 		if err := rt.Run(":10629"); err != nil {
 			log.Fatal(err)
 		}
-	}()
-	
-
-}
+		}()
+		
+		// Start r router on the main goroutine
+		if err := r.Run(":10628"); err != nil {
+			log.Fatal(err)
+		}
+		}
