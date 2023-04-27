@@ -17,6 +17,8 @@ import (
 	"github.com/DiodeCN/RedDockBackend/SimpleModule/iwantatoken"
 
 	initprint "github.com/DiodeCN/RedDockBackend/RefactoredModule/initprint"
+	"github.com/DiodeCN/RedDockBackend/RefactoredModule/getuserinfo"
+
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
