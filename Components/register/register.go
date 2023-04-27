@@ -172,7 +172,7 @@ func RegisterHandler(usersCollection *mongo.Collection, inviterCollection *mongo
 				return
 			}
 		
-			c.JSON(http.StatusOK, gin.H{"message": "user_registered_successfully", "token": encryptedToken, "uid": strconv.Itoa(uid)})
+			c.JSON(http.StatusOK, gin.H{"message": "user_registered_successfully", "token": encryptedToken, "uid": strconv.Itoa(int(uid))})
 		}
 		
 	}
