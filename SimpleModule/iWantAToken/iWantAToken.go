@@ -171,19 +171,19 @@ func TokenHandler(usersCollection *mongo.Collection) func(c *gin.Context) {
 				c.JSON(http.StatusOK, gin.H{"message": "Token is valid, new entry created"})
 			} else if err != nil {
 				c.JSON(http.StatusInternalServerError, gin.H{"error": "Error querying the database"})
-			} else {
-				accountStatusRaw := result["accountStatus"]
-				accountStatus := ""
-				if accountStatusRaw != nil {
-					accountStatus = accountStatusRaw.(string)
-				}
-				if accountStatus == "0" || accountStatus == "" {
-					c.JSON(http.StatusOK, gin.H{"message": "Token is valid"})
 				} else {
-					c.JSON(http.StatusBadRequest, gin.H{"error": accountStatus})
+					accountStatusRaw := result["accountStatus"]
+					accountStatus := ""
+					uid := result["_id"] // 获取用户的_id
+					if accountStatusRaw != nil {
+						accountStatus = accountStatusRaw.(string)
+					}
+					if accountStatus == "0" || accountStatus == "" {
+						c.JSON(http.StatusOK, gin.H{"message": "Token is valid", "uid": uid}) // 返回包含uid的响应
+					} else {
+						c.JSON(http.StatusBadRequest, gin.H{"error": accountStatus})
+					}
 				}
-			}
-
 		} else {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid token"})
 		}
