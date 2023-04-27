@@ -23,3 +23,4 @@ func AvatarHandler(usersCollection *mongo.Collection, cwd string) gin.HandlerFun
 		c.FileAttachment(filePath, avatarID+".png")
 	}
 }
+
