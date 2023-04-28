@@ -17,15 +17,17 @@ type UserInfo struct {
 
 func GetUserInfoHandler(usersCollection *mongo.Collection) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		hexUserID := c.Param("userid")
+		// hexUserID := c.Param("userid")
 
 		// Convert hex string to int32
+		/*
 		decodedUserID, err := strconv.ParseInt(hexUserID, 16, 32)
 		if err != nil {
 			c.JSON(400, gin.H{"error": "Invalid user ID format"})
 			return
 		}
-		userID := int32(decodedUserID)
+		*/
+		userID := int32(c.Param("userid"))
 
 		fmt.Printf("UserID: %d\n", userID)
 
