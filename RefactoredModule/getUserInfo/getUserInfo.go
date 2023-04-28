@@ -3,7 +3,6 @@ package getuserinfo
 import (
 	"context"
 	"fmt"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
@@ -17,17 +16,15 @@ type UserInfo struct {
 
 func GetUserInfoHandler(usersCollection *mongo.Collection) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		// hexUserID := c.Param("userid")
+		userIDStr := c.Param("userid")
 
-		// Convert hex string to int32
-		/*
-		decodedUserID, err := strconv.ParseInt(hexUserID, 16, 32)
+		// Convert string to int
+		userIDInt, err := strconv.Atoi(userIDStr)
 		if err != nil {
 			c.JSON(400, gin.H{"error": "Invalid user ID format"})
 			return
 		}
-		*/
-		userID := int32(c.Param("userid"))
+		userID := int32(userIDInt)
 
 		fmt.Printf("UserID: %d\n", userID)
 
