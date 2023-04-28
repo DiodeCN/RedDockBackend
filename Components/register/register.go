@@ -102,6 +102,9 @@ func VerifyAndRegisterUser(ctx context.Context, usersCollection *mongo.Collectio
 				"password":         hashedPassword, // 将原始密码替换为哈希后的密码
 				"verificationCode": verificationCode,
 				"requestCount": 	"0",
+				"title":            "访客",
+				"introduction":     "没有简介的神秘人",
+
 			},
 		}
 
