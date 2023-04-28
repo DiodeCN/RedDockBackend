@@ -13,6 +13,8 @@ import (
 type UserInfo struct {
 	PhoneNumber string `bson:"phoneNumber"`
 	Nickname    string `bson:"nickname"`
+	Introduction string `bson:"introduction"`
+	Title       string `bson:"title"`
 }
 
 func GetUserInfoHandler(usersCollection *mongo.Collection) gin.HandlerFunc {
