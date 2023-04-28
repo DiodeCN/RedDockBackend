@@ -99,7 +99,7 @@ func main() {
 	r.POST("/api/tokencheck", iwantatoken.TokenHandler(usersCollection))
 
 	rt.GET("/api/avatar/:filename", whereismyavatar.AvatarHandler(usersCollection, cwd))
-	r.GET("/api/userinfo/:userid", getuserinfo.GetUserInfoHandler(usersCollection))
+	rt.GET("/api/userinfo/:userid", getuserinfo.GetUserInfoHandler(usersCollection))
 
 
 	// Start rt router on a separate goroutine
