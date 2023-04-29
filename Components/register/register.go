@@ -11,7 +11,7 @@ import (
 	"strconv"
 
 	hash "github.com/DiodeCN/RedDockBackend/RefactoredModule/hash"
-	"github.com/DiodeCN/RedDockBackend/SimpleModule/CanSendVerificationCode"
+	CanSendVerificationCode "github.com/DiodeCN/RedDockBackend/SimpleModule/canSendVerificationCode"
 	globalDataManipulation "github.com/DiodeCN/RedDockBackend/SimpleModule/globalDataManipulation"
 	iwantatoken "github.com/DiodeCN/RedDockBackend/SimpleModule/iwantatoken"
 
@@ -101,10 +101,9 @@ func VerifyAndRegisterUser(ctx context.Context, usersCollection *mongo.Collectio
 				"phoneNumber":      phoneNumber,
 				"password":         hashedPassword, // 将原始密码替换为哈希后的密码
 				"verificationCode": verificationCode,
-				"requestCount": 	"0",
+				"requestCount":     "0",
 				"title":            "访客",
 				"introduction":     "没有简介的神秘人",
-
 			},
 		}
 
@@ -162,10 +161,10 @@ func RegisterHandler(usersCollection *mongo.Collection, inviterCollection *mongo
 			if err != nil {
 				log.Fatal(err)
 			}
-			
+
 			// 创建Token字符串
 			tokenString := phoneNumber + "|" + requestData.Timestamp
-		
+
 			// 使用iwantatoken加密Token
 			secretKey := []byte(iwantatoken.GetTokenSecretKey())
 			encryptedToken, err := iwantatoken.Encrypt(tokenString, secretKey)
@@ -174,10 +173,10 @@ func RegisterHandler(usersCollection *mongo.Collection, inviterCollection *mongo
 				c.JSON(http.StatusInternalServerError, gin.H{"error": "Token encryption failed"})
 				return
 			}
-		
+
 			c.JSON(http.StatusOK, gin.H{"message": "user_registered_successfully", "token": encryptedToken, "uid": strconv.Itoa(int(uid))})
 		}
-		
+
 	}
 }
 
