@@ -276,8 +276,6 @@ func RegisterSMS(phoneNumberSet []string, templateParamSet []string) {
 		return
 	}
 
-	// 水两下啦
-
 	if err != nil {
 		panic(err)
 	}
