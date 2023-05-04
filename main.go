@@ -97,8 +97,8 @@ func main() {
 	r.POST("/api/tokencheck", iwantatoken.TokenHandler(usersCollection))
 
 	rt.POST("/api/posttweet", tweet.PostTweetHandler(tweetsCollection))
-
-	rt.GET("/api/avatar/:filename", whereismyavatar.AvatarHandler(usersCollection, cwd))
+	rt.POST("/api/avatar/:filename", whereismyavatar.AvatarHandler(usersCollection, cwd))
+	
 	rt.GET("/api/userinfo/:userid", getuserinfo.GetUserInfoHandler(usersCollection))
 
 	// Start rt router on a separate goroutine

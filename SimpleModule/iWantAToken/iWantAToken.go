@@ -214,6 +214,7 @@ func TokenMiddleware() gin.HandlerFunc {
 			return
 		}
 
+		log.Println(token)
 
 		// 调用 CheckForDelimiter 函数来验证 token 值
 		valid, err := CheckForDelimiter(token)
