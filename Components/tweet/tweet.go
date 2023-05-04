@@ -32,6 +32,13 @@ type Tweet struct {
 	SenderUID string `json:"senderUID" bson:"senderUID"`
 }
 
+type PostTweet struct {
+	Username  string    `json:"username"`
+	Content   string    `json:"content"`
+	Timestamp time.Time `json:"timestamp"`
+}
+
+
 func NewTweet(id, name, avatarURL, content string) *Tweet {
 	return &Tweet{
 		UID:       id,
