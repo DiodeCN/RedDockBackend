@@ -205,6 +205,15 @@ func TokenMiddleware() gin.HandlerFunc {
 			return
 		}
 
+		if token == "" {
+			var tokenBody struct {
+				Token string `json:"token"`
+			}
+			if err := c.ShouldBindJSON(&tokenBody); err == nil {
+				token = tokenBody.Token
+			}
+		}
+
 		// 调用 CheckForDelimiter 函数来验证 token 值
 		valid, err := CheckForDelimiter(token)
 		if err != nil {
