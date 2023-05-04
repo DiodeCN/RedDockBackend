@@ -96,6 +96,8 @@ func main() {
 	r.POST("/api/register", register.RegisterHandler(usersCollection, inviterCollection))
 	r.POST("/api/tokencheck", iwantatoken.TokenHandler(usersCollection))
 
+	rt.POST("/api/posttweet", tweet.PostTweetHandler(tweetsCollection))
+
 	rt.GET("/api/avatar/:filename", whereismyavatar.AvatarHandler(usersCollection, cwd))
 	rt.GET("/api/userinfo/:userid", getuserinfo.GetUserInfoHandler(usersCollection))
 
