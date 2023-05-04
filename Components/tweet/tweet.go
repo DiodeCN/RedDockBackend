@@ -118,3 +118,23 @@ func GetAllTweets(ctx context.Context, tweetsCollection *mongo.Collection) ([]Tw
 
 	return tweets, nil
 }
+
+func PostTweetHandler(tweetsCollection *mongo.Collection) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var newTweet Tweet
+		if err := c.ShouldBindJSON(&newTweet); err != nil {
+			c.JSON(400, gin.H{"error": err.Error()})
+			return
+		}
+
+		newTweet.Timestamp = time.Now()
+
+		_, err := tweetsCollection.InsertOne(context.Background(), newTweet)
+		if err != nil {
+			c.JSON(500, gin.H{"error": "Error inserting tweet into database"})
+			return
+		}
+
+		c.JSON(200, gin.H{"success": "Tweet successfully posted"})
+	}
+}
