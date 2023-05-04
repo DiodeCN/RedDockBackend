@@ -12,13 +12,12 @@ import (
 	"github.com/DiodeCN/RedDockBackend/Components/register"
 	"github.com/DiodeCN/RedDockBackend/Components/tweet"
 
+	"github.com/DiodeCN/RedDockBackend/SimpleModule/iwantatoken"
 	"github.com/DiodeCN/RedDockBackend/SimpleModule/requestlogger"
 	"github.com/DiodeCN/RedDockBackend/SimpleModule/whereismyavatar"
-	"github.com/DiodeCN/RedDockBackend/SimpleModule/iwantatoken"
 
-	initprint "github.com/DiodeCN/RedDockBackend/RefactoredModule/initprint"
 	"github.com/DiodeCN/RedDockBackend/RefactoredModule/getuserinfo"
-
+	initprint "github.com/DiodeCN/RedDockBackend/RefactoredModule/initprint"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -51,7 +50,6 @@ func main() {
 	r.Use(cors.New(config))
 
 	rt.Use(iwantatoken.TokenMiddleware()) // 使用TokenMiddleware
-
 
 	ctx := context.Background()
 
@@ -101,16 +99,15 @@ func main() {
 	rt.GET("/api/avatar/:filename", whereismyavatar.AvatarHandler(usersCollection, cwd))
 	rt.GET("/api/userinfo/:userid", getuserinfo.GetUserInfoHandler(usersCollection))
 
-
 	// Start rt router on a separate goroutine
 	go func() {
 		if err := rt.Run(":10629"); err != nil {
 			log.Fatal(err)
 		}
-		}()
-		
-		// Start r router on the main goroutine
-		if err := r.Run(":10628"); err != nil {
-			log.Fatal(err)
-		}
-		}
+	}()
+
+	// Start r router on the main goroutine
+	if err := r.Run(":10628"); err != nil {
+		log.Fatal(err)
+	}
+}
