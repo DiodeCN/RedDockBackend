@@ -123,7 +123,7 @@ func GetAllTweets(ctx context.Context, tweetsCollection *mongo.Collection) ([]Tw
 
 func PostTweetHandler(tweetsCollection *mongo.Collection) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var newTweet Tweet
+		var newTweet PostTweet
 		if err := c.ShouldBindJSON(&newTweet); err != nil {
 			c.JSON(400, gin.H{"error": err.Error()})
 			return
