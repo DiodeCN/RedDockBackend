@@ -194,6 +194,15 @@ func TokenMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token := c.GetHeader("Authorization")
 
+		if token == "" {
+			var tokenBody struct {
+				Token string `json:"token"`
+			}
+			if err := c.ShouldBindJSON(&tokenBody); err == nil {
+				token = tokenBody.Token
+			}
+		}
+
 		// 从 URL 参数中获取 token，如果没有在 header 中找到 token
 		if token == "" {
 			token, _ = c.GetQuery("token")
@@ -205,14 +214,6 @@ func TokenMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		if token == "" {
-			var tokenBody struct {
-				Token string `json:"token"`
-			}
-			if err := c.ShouldBindJSON(&tokenBody); err == nil {
-				token = tokenBody.Token
-			}
-		}
 
 		// 调用 CheckForDelimiter 函数来验证 token 值
 		valid, err := CheckForDelimiter(token)
