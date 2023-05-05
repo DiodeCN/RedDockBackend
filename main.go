@@ -38,7 +38,8 @@ func main() {
 	config := cors.DefaultConfig()
 	config.AllowAllOrigins = true
 	config.AllowHeaders = append(config.AllowHeaders, "Authorization")
-	
+	config.AllowHeaders = append(config.AllowHeaders, "")
+
 	r := gin.Default()
 	r.Use(cors.New(config))
 	r.Use(requestlogger.RequestLogger())
