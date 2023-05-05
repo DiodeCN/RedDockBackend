@@ -35,19 +35,19 @@ func main() {
 	rand.Seed(time.Now().UnixNano())
 	gin.SetMode(gin.ReleaseMode)
 
-	r := gin.Default()
-	r.Use(cors.Default())
-	r.Use(requestlogger.RequestLogger())
-
-	rt := gin.Default()
-	rt.Use(cors.Default())
-	rt.Use(requestlogger.RequestLogger())
-
 	config := cors.DefaultConfig()
 	config.AllowAllOrigins = true
 	config.AllowHeaders = append(config.AllowHeaders, "Authorization")
-	rt.Use(cors.New(config))
+	
+	r := gin.Default()
 	r.Use(cors.New(config))
+	r.Use(requestlogger.RequestLogger())
+
+	rt := gin.Default()
+	rt.Use(cors.New(config))
+	rt.Use(requestlogger.RequestLogger())
+
+
 
 	rt.Use(iwantatoken.TokenMiddleware()) // 使用TokenMiddleware
 
